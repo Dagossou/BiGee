@@ -39,7 +39,8 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke
 
 /* setup / login / loading */
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:26px;z-index:20;background:var(--bg);overflow-y:auto}
-.screen.hide{display:none}
+.screen.hide{display:none !important}
+#screen-app{padding:0;justify-content:flex-start;overflow:hidden}
 .brandbig{display:flex;align-items:center;gap:11px;font-weight:800;font-size:22px;letter-spacing:-.5px;margin-bottom:6px}
 .brandbig .logo{width:42px;height:42px;border-radius:13px;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center}
 .screen h1{font-size:20px;font-weight:800;margin:10px 0 4px}
@@ -193,7 +194,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
   <div class="screen hide" id="screen-loading"><div class="spin"></div><p style="text-align:center;margin-top:16px">Chargement…</p></div>
 
   <!-- APP -->
-  <div class="screen hide" id="screen-app" style="padding:0;position:relative;display:flex;flex-direction:column">
+  <div class="screen hide" id="screen-app">
     <div class="appbar">
       <div class="brand"><span class="logo"><svg class="i"><use href="#chevrons"/></svg></span>BiGee</div>
       <div class="grp"><div class="ico-btn" onclick="location.reload()"><svg class="i"><use href="#bell"/></svg></div><div class="ico-btn" onclick="logout()"><svg class="i"><use href="#logout"/></svg></div></div>
