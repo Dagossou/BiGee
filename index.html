@@ -54,6 +54,16 @@ input.tf:focus{outline:none;border-color:var(--green)}
 .msg{font-size:12.5px;margin-top:12px;padding:11px 13px;border-radius:11px;font-weight:600}
 .msg.ok{background:var(--green-bg);color:var(--green-tx)}.msg.err{background:var(--coral-bg);color:var(--coral-tx)}
 .spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--green);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto}@keyframes sp{to{transform:rotate(360deg)}}
+.splash{margin:auto;text-align:center}
+.splash-logo{width:62px;height:62px;border-radius:20px;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center;margin:0 auto;animation:pulse 1.25s ease-in-out infinite}
+.splash-logo svg{width:32px;height:32px;stroke-width:2.6}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.14);opacity:.72}}
+.splash-name{margin-top:18px;font-size:19px;font-weight:800;letter-spacing:-.3px;opacity:0;animation:fadeup .6s ease .15s forwards}
+.splash-dots{margin-top:10px;display:flex;gap:6px;justify-content:center}
+.splash-dots i{width:7px;height:7px;border-radius:50%;background:var(--green);opacity:.35;animation:bounce 1s infinite}
+.splash-dots i:nth-child(2){animation-delay:.15s}.splash-dots i:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+@keyframes fadeup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .appbar{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top) + 10px) 18px 8px}
 .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;letter-spacing:-.4px}
 .brand .logo{width:30px;height:30px;border-radius:10px;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center}
@@ -254,7 +264,13 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
     <button class="btn" style="background:var(--daniel);color:#043430;margin-top:10px" onclick="pickWho('Daniel')">Je suis Daniel</button>
   </div>
 
-  <div class="screen hide" id="screen-loading"><div class="spin"></div><p style="text-align:center;margin-top:16px">Chargement…</p></div>
+  <div class="screen hide" id="screen-loading">
+    <div class="splash">
+      <div class="splash-logo"><svg class="i"><use href="#chevrons"/></svg></div>
+      <div class="splash-name" id="loadName">BiGee</div>
+      <div class="splash-dots"><i></i><i></i><i></i></div>
+    </div>
+  </div>
 
   <div class="screen hide" id="screen-app">
     <div class="appbar">
@@ -262,7 +278,6 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
       <div class="grp"><div class="ico-btn" onclick="navTo('apercu')" title="Vue d'ensemble"><svg class="i"><use href="#grid"/></svg></div><div class="ico-btn" onclick="enableNotifications()" title="Activer les rappels"><svg class="i"><use href="#bell"/></svg></div><div class="ico-btn" onclick="logout()"><svg class="i"><use href="#logout"/></svg></div></div>
     </div>
     <div class="body">
-      <div class="who" id="who"></div>
 
       <div class="pane on" id="p-accueil">
         <div class="greet"><h2 id="gHello">Bonjour</h2><p id="gDate"></p></div>
@@ -309,6 +324,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
       <div class="pane" id="p-semaine">
         <div class="weeknav"><button onclick="chgWeek(-1)"><svg class="i"><use href="#left"/></svg></button><span class="wl" id="wLabel">Semaine 1 · Mois 1</span><button onclick="chgWeek(1)"><svg class="i"><use href="#right"/></svg></button></div>
         <div class="seg" id="segWeek"><button class="act" data-r="Diana">Diana</button><button data-r="Daniel">Daniel</button><button data-r="Couple">Couple</button></div>
+        <div class="seg" id="filtStat" style="margin-top:0"><button class="act" data-s="all">Tous</button><button data-s="a_faire">À faire</button><button data-s="en_cours">En cours</button><button data-s="fait">Fait</button></div>
         <button class="btn-primary" style="margin:0 0 12px" onclick="addTask()"><svg class="i"><use href="#plus"/></svg> Ajouter une action</button>
         <div id="weekList"></div>
       </div>
@@ -363,6 +379,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
           <button class="act" data-m="0">Tous</button>
           <button data-m="1">M1</button><button data-m="2">M2</button><button data-m="3">M3</button><button data-m="4">M4</button><button data-m="5">M5</button><button data-m="6">M6</button>
         </div>
+        <div class="seg" id="filtStatAp"><button class="act" data-s="all">Tous</button><button data-s="a_faire">À faire</button><button data-s="en_cours">En cours</button><button data-s="fait">Fait</button></div>
         <div class="card" id="apSummary"></div>
         <div id="apList"></div>
       </div>
@@ -387,7 +404,7 @@ const SUPA_URL='https://sapojxjmrzjrfjiejgwv.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhcG9qeGptcnpqcmZqaWVqZ3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4ODY5MzgsImV4cCI6MjA5ODQ2MjkzOH0.kHd3h70SrDgd1S1H4GRd2hm8lbtCpJpoH8zJOkVF340';
 // =============================================
 const LS={week:'bigee_week'};
-let supa=null, DEMO=false, USER=null, ACTIONS=[], CURW=Number(localStorage.getItem(LS.week)||1), SEGR='Diana', FOCR='Diana', CUR=null, CURPANE='accueil', MODE='signin', INAPP=false, APM=0;
+let supa=null, DEMO=false, USER=null, ACTIONS=[], CURW=Number(localStorage.getItem(LS.week)||1), SEGR='Diana', FOCR='Diana', CUR=null, CURPANE='accueil', MODE='signin', INAPP=false, APM=0, WSTAT='all', APS='all';
 const MONTH=w=>Math.ceil(w/4);
 const RESP=['Diana','Daniel','Couple'];
 const RCLS={Diana:'oDiana',Daniel:'oDaniel',Couple:'oCouple'};
@@ -417,6 +434,7 @@ async function refreshPush(){
 function minus30(t){const p=t.split(':');let d=Number(p[0])*60+Number(p[1])-30;if(d<0)d+=1440;return String(Math.floor(d/60)).padStart(2,'0')+':'+String(d%60).padStart(2,'0');}
 function offMin(t,n){const p=t.split(':');let d=Number(p[0])*60+Number(p[1])-n;d=((d%1440)+1440)%1440;return String(Math.floor(d/60)).padStart(2,'0')+':'+String(d%60).padStart(2,'0');}
 function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function helloWord(){const h=new Date().getHours();return (h>=18||h<5)?'Bonsoir':'Bonjour';}
 
 function saveConfig(){const u=document.getElementById('cfgUrl').value.trim(),k=document.getElementById('cfgKey').value.trim();if(!u||!k){document.getElementById('cfgMsg').innerHTML='<div class="msg err">Renseigne les deux champs.</div>';return;}localStorage.setItem(LS.url,u);localStorage.setItem(LS.key,k);boot();}
 function resetConfig(){localStorage.removeItem(LS.url);localStorage.removeItem(LS.key);location.reload();}
@@ -441,9 +459,11 @@ async function route(session){
   USER=session.user;
   const prenom=USER.user_metadata&&USER.user_metadata.prenom;
   if(!prenom){scr('identity');return;}
+  document.getElementById('loadName').textContent=helloWord()+' '+prenom;
   scr('loading');await loadActions();subscribe();scr('app');initApp();
 }
 async function pickWho(name){
+  document.getElementById('loadName').textContent=helloWord()+' '+name;
   scr('loading');
   try{await supa.auth.updateUser({data:{prenom:name}});}catch(e){}
   if(!USER.user_metadata)USER.user_metadata={};
@@ -462,13 +482,14 @@ function setHeure(){const t=document.getElementById('dTime').value||null;persist
 
 function initApp(){
   INAPP=true;
-  document.getElementById('who').innerHTML=DEMO?'Mode démo — <b>données non synchronisées</b>':'Connecté : <b>'+esc(USER.email)+'</b> · synchronisé';
   document.querySelectorAll('.nav button[data-p]').forEach(b=>b.onclick=()=>navTo(b.dataset.p));
   document.querySelectorAll('#segWeek button').forEach(b=>b.onclick=()=>{SEGR=b.dataset.r;document.querySelectorAll('#segWeek button').forEach(x=>x.classList.toggle('act',x===b));renderWeek();});
   document.querySelectorAll('#segFocus button').forEach(b=>b.onclick=()=>{FOCR=b.dataset.r;document.querySelectorAll('#segFocus button').forEach(x=>x.classList.toggle('act',x===b));renderFocus();});
   document.querySelectorAll('#segMonth button').forEach(b=>b.onclick=()=>{APM=Number(b.dataset.m);document.querySelectorAll('#segMonth button').forEach(x=>x.classList.toggle('act',x===b));renderApercu();});
+  document.querySelectorAll('#filtStat button').forEach(b=>b.onclick=()=>{WSTAT=b.dataset.s;document.querySelectorAll('#filtStat button').forEach(x=>x.classList.toggle('act',x===b));renderWeek();});
+  document.querySelectorAll('#filtStatAp button').forEach(b=>b.onclick=()=>{APS=b.dataset.s;document.querySelectorAll('#filtStatAp button').forEach(x=>x.classList.toggle('act',x===b));renderApercu();});
   const prenom=(USER.user_metadata&&USER.user_metadata.prenom)||'Diana';
-  document.getElementById('gHello').textContent='Bonjour '+prenom;
+  document.getElementById('gHello').textContent=helloWord()+' '+prenom;
   renderAll();history.replaceState({pane:'accueil'},'');show('accueil');refreshPush();
 }
 function show(p){document.querySelectorAll('.pane').forEach(e=>e.classList.remove('on'));document.getElementById('p-'+p).classList.add('on');document.querySelectorAll('.nav button[data-p]').forEach(b=>b.classList.toggle('act',b.dataset.p===p));document.querySelector('.body').scrollTop=0;if(p!=='detail')CURPANE=p;}
@@ -535,9 +556,9 @@ function buildPtab(wk){
 }
 function renderWeek(){
   document.getElementById('wLabel').textContent='Semaine '+CURW+' · Mois '+MONTH(CURW);
-  const rows=ACTIONS.filter(a=>a.semaine===CURW&&a.responsable===SEGR).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
+  const rows=ACTIONS.filter(a=>a.semaine===CURW&&a.responsable===SEGR&&(WSTAT==='all'||a.statut===WSTAT)).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
   const el=document.getElementById('weekList');
-  if(!rows.length){el.innerHTML='<div class="empty">Aucune action ici.<br>Vérifie que la base est bien remplie (setup.sql).</div>';return;}
+  if(!rows.length){el.innerHTML='<div class="empty">Aucune action '+(WSTAT!=='all'?'dans ce statut':'ici')+'.</div>';return;}
   el.innerHTML=rows.map(taskHTML).join('');
 }
 function taskHTML(a){
@@ -563,7 +584,7 @@ async function addTask(){const titre=prompt('Nouvelle action pour '+SEGR+' (sema
 function toggleEdit(){const c=document.getElementById('editCard');const sh=c.style.display==='none';if(sh){document.getElementById('eTitre').value=CUR.titre||'';document.getElementById('eDuree').value=CUR.duree||'';document.getElementById('ePrio').value=CUR.priorite||'P2';document.getElementById('eCat').value=CUR.categorie||'';}c.style.display=sh?'block':'none';}
 async function saveEdit(){const patch={titre:(document.getElementById('eTitre').value.trim()||CUR.titre),duree:document.getElementById('eDuree').value.trim(),priorite:document.getElementById('ePrio').value,categorie:document.getElementById('eCat').value.trim()};await persist(CUR.id,patch);document.getElementById('editCard').style.display='none';renderDetail();toast('Action modifiée');}
 async function deleteTask(){if(!confirm('Supprimer définitivement cette action ?'))return;const id=CUR.id;ACTIONS=ACTIONS.filter(a=>a.id!==id);if(!DEMO){const {error}=await supa.from('actions').delete().eq('id',id);if(error){toast('Suppression impossible');}}renderAll();history.back();toast('Action supprimée');}
-function renderApercu(){const rows=APM===0?ACTIONS:ACTIONS.filter(a=>a.mois===APM);const done=rows.filter(a=>a.statut==='fait').length;const pct=rows.length?Math.round(done/rows.length*100):0;const sm=document.getElementById('apSummary');if(sm){sm.innerHTML='<div class="hrow"><b style="font-size:14px">'+(APM===0?'Les 6 mois':'Mois '+APM)+'</b><span style="font-weight:800">'+done+' / '+rows.length+' · '+pct+'%</span></div><div class="track" style="margin-top:8px"><i style="width:'+pct+'%"></i></div>';}const byW={};rows.forEach(a=>{(byW[a.semaine]=byW[a.semaine]||[]).push(a);});const weeks=Object.keys(byW).map(Number).sort((a,b)=>a-b);const SP={a_faire:['st-todo','À faire'],en_cours:['st-prog','En cours'],fait:['st-done','Fait']};let h='';weeks.forEach(w=>{h+='<div class="section-title" style="margin-top:14px">Semaine '+w+' · Mois '+MONTH(w)+'</div>';byW[w].sort((a,b)=>a.responsable.localeCompare(b.responsable)||((a.ordre||0)-(b.ordre||0)));h+=byW[w].map(a=>{const sp=SP[a.statut]||SP.a_faire;return '<div class="task" style="padding:10px" onclick="openDetail(\''+a.id+'\')"><div style="flex:1"><p class="tt" style="font-size:12.5px">'+esc(a.titre)+'</p><div class="tmeta"><span class="owner '+RCLS[a.responsable]+'">'+a.responsable+'</span><span class="stat-pill '+sp[0]+'">'+sp[1]+'</span></div></div><span class="chev"><svg class="i" style="width:16px"><use href="#chev"/></svg></span></div>';}).join('');});const el=document.getElementById('apList');if(el)el.innerHTML=h||'<div class="empty">Aucune action.</div>';}
+function renderApercu(){let rows=APM===0?ACTIONS.slice():ACTIONS.filter(a=>a.mois===APM);if(APS!=='all')rows=rows.filter(a=>a.statut===APS);const done=rows.filter(a=>a.statut==='fait').length;const pct=rows.length?Math.round(done/rows.length*100):0;const sm=document.getElementById('apSummary');if(sm){sm.innerHTML='<div class="hrow"><b style="font-size:14px">'+(APM===0?'Les 6 mois':'Mois '+APM)+'</b><span style="font-weight:800">'+done+' / '+rows.length+' · '+pct+'%</span></div><div class="track" style="margin-top:8px"><i style="width:'+pct+'%"></i></div>';}const byW={};rows.forEach(a=>{(byW[a.semaine]=byW[a.semaine]||[]).push(a);});const weeks=Object.keys(byW).map(Number).sort((a,b)=>a-b);const SP={a_faire:['st-todo','À faire'],en_cours:['st-prog','En cours'],fait:['st-done','Fait']};let h='';weeks.forEach(w=>{h+='<div class="section-title" style="margin-top:14px">Semaine '+w+' · Mois '+MONTH(w)+'</div>';byW[w].sort((a,b)=>a.responsable.localeCompare(b.responsable)||((a.ordre||0)-(b.ordre||0)));h+=byW[w].map(a=>{const sp=SP[a.statut]||SP.a_faire;return '<div class="task" style="padding:10px" onclick="openDetail(\''+a.id+'\')"><div style="flex:1"><p class="tt" style="font-size:12.5px">'+esc(a.titre)+'</p><div class="tmeta"><span class="owner '+RCLS[a.responsable]+'">'+a.responsable+'</span><span class="stat-pill '+sp[0]+'">'+sp[1]+'</span></div></div><span class="chev"><svg class="i" style="width:16px"><use href="#chev"/></svg></span></div>';}).join('');});const el=document.getElementById('apList');if(el)el.innerHTML=h||'<div class="empty">Aucune action.</div>';}
 function renderDetail(){
   const a=CUR;
   const o=document.getElementById('dOwner');o.textContent=a.responsable;o.className='owner '+RCLS[a.responsable];
