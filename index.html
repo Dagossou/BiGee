@@ -399,6 +399,7 @@ async function refreshPush(){
   try{const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID_PUBLIC)});await savePush(sub);}catch(e){}
 }
 function minus30(t){const p=t.split(':');let d=Number(p[0])*60+Number(p[1])-30;if(d<0)d+=1440;return String(Math.floor(d/60)).padStart(2,'0')+':'+String(d%60).padStart(2,'0');}
+function offMin(t,n){const p=t.split(':');let d=Number(p[0])*60+Number(p[1])-n;d=((d%1440)+1440)%1440;return String(Math.floor(d/60)).padStart(2,'0')+':'+String(d%60).padStart(2,'0');}
 function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 
 function saveConfig(){const u=document.getElementById('cfgUrl').value.trim(),k=document.getElementById('cfgKey').value.trim();if(!u||!k){document.getElementById('cfgMsg').innerHTML='<div class="msg err">Renseigne les deux champs.</div>';return;}localStorage.setItem(LS.url,u);localStorage.setItem(LS.key,k);boot();}
@@ -437,7 +438,7 @@ function totOf(r){return ACTIONS.filter(a=>a.responsable===r).length;}
 async function persist(id,patch){const a=ACTIONS.find(x=>x.id===id);if(a)Object.assign(a,patch);renderAll();if(DEMO)return;const {error}=await supa.from('actions').update(patch).eq('id',id);if(error)toast('Sauvegarde impossible');}
 function cycle(id){const a=ACTIONS.find(x=>x.id===id);const nx={a_faire:'en_cours',en_cours:'fait',fait:'a_faire'}[a.statut];persist(id,{statut:nx,fait_le:nx==='fait'?new Date().toISOString():null,fait_par:nx==='fait'?((USER&&USER.id)||null):null});}
 function setStatut(s){persist(CUR.id,{statut:s,fait_le:s==='fait'?new Date().toISOString():null});renderDetail();}
-function setHeure(){const t=document.getElementById('dTime').value||null;persist(CUR.id,{heure_prevue:t,rappel_at:t?minus30(t):null});renderRem();toast(t?('Rappel programmé à '+minus30(t)):'Heure retirée');}
+function setHeure(){const t=document.getElementById('dTime').value||null;persist(CUR.id,{heure_prevue:t,rappel_at:null});renderRem();toast(t?'Rappels : 15 min, 5 min avant, et à l’heure':'Heure retirée');}
 
 function initApp(){
   document.getElementById('who').innerHTML=DEMO?'Mode démo — <b>données non synchronisées</b>':'Connecté : <b>'+esc(USER.email)+'</b> · synchronisé';
@@ -551,8 +552,10 @@ function renderDetail(){
 }
 function renderRem(){
   const a=CUR,el=document.getElementById('dRem');
-  if(!a.heure_prevue){el.innerHTML='<p class="sub">Aucune heure définie. Choisis une heure : un rappel sera programmé 30 min avant.</p>';return;}
-  el.innerHTML='<div class="reminder"><span class="ric"><svg class="i"><use href="#bell"/></svg></span><div style="flex:1"><b>Rappel automatique</b><div class="sub">30 min avant · à '+minus30(a.heure_prevue)+'</div></div><span class="stat-pill st-done">Programmé</span></div>'
+  if(!a.heure_prevue){el.innerHTML='<p class="sub">Aucune heure définie. Choisis une heure : des rappels seront programmés à 15 min et 5 min avant, puis à l’heure prévue.</p>';return;}
+  const t=a.heure_prevue;
+  const line=(txt,tm)=>'<div class="reminder" style="margin-bottom:8px"><span class="ric"><svg class="i"><use href="#bell"/></svg></span><div style="flex:1"><b>'+txt+'</b><div class="sub">à '+tm+'</div></div><span class="stat-pill st-done">✓</span></div>';
+  el.innerHTML=line('15 minutes avant',offMin(t,15))+line('5 minutes avant',offMin(t,5))+line('À l’heure prévue',t)
     +'<div class="channels"><span class="chan on">Push</span><span class="chan on">In-app</span><span class="chan off">SMS · bientôt</span><span class="chan off">WhatsApp · bientôt</span></div>';
 }
 function renderRevue(){
