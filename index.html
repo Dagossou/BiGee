@@ -154,6 +154,8 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 .ric{width:36px;height:36px;border-radius:11px;background:var(--green-bg);color:var(--green-tx);display:flex;align-items:center;justify-content:center;flex:none}
 .reminder b{font-size:12.5px;font-weight:800}
 .channels{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.chippreset{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer}
+.chippreset:active{background:var(--chip)}
 .chan{font-size:10px;font-weight:800;padding:5px 9px;border-radius:20px}.chan.on{background:var(--green-bg);color:var(--green-tx)}.chan.off{background:var(--chip);color:var(--muted)}
 .focus-hd{background:var(--green);color:var(--green-ink);border:none;text-align:center;border-radius:20px}
 .focus-hd h3{color:var(--green-ink);justify-content:center;opacity:.75}
@@ -344,7 +346,16 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
           <select id="eResp" class="tf"><option>Diana</option><option>Daniel</option><option>Couple</option></select>
           <div style="display:flex;gap:8px;margin-top:8px"><div style="flex:1"><label class="lb" style="margin:0 0 6px">Semaine</label><select id="eSem" class="tf"></select></div><div style="flex:1"><label class="lb" style="margin:0 0 6px">Heure</label><input class="tf" id="eHeure" type="time"></div></div>
           <label class="lb" style="margin-top:8px">Date (optionnel)</label><input class="tf" id="eDate" type="date">
-          <div style="display:flex;gap:8px;margin-top:8px"><input class="tf" id="eDuree" placeholder="Durée (ex. 1h)" style="flex:1"><select id="ePrio" class="tf" style="flex:1"><option>P1</option><option>P2</option><option>P3</option></select></div>
+          <label class="lb" style="margin-top:8px">Rappels — minutes avant l'heure</label>
+          <input class="tf" id="eRappels" placeholder="ex. 15, 5, 0">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+            <button type="button" class="chippreset" onclick="setRap('0')">À l'heure</button>
+            <button type="button" class="chippreset" onclick="setRap('15')">15 min</button>
+            <button type="button" class="chippreset" onclick="setRap('30')">30 min</button>
+            <button type="button" class="chippreset" onclick="setRap('60')">1 h</button>
+            <button type="button" class="chippreset" onclick="setRap('15,5,0')">15 + 5 + 0</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px"><input class="tf" id="eDuree" placeholder="Durée (ex. 1h)" style="flex:1"><select id="ePrio" class="tf" style="flex:1"><option>P1</option><option>P2</option><option>P3</option></select></div>
           <input class="tf" id="eCat" placeholder="Catégorie" style="margin-top:8px">
           <button class="cta" id="editSaveBtn" style="margin-top:12px" onclick="saveEdit()">Enregistrer</button>
         </div>
@@ -436,6 +447,8 @@ async function refreshPush(){
 }
 function minus30(t){const p=t.split(':');let d=Number(p[0])*60+Number(p[1])-30;if(d<0)d+=1440;return String(Math.floor(d/60)).padStart(2,'0')+':'+String(d%60).padStart(2,'0');}
 function offMin(t,n){const p=t.split(':');let d=Number(p[0])*60+Number(p[1])-n;d=((d%1440)+1440)%1440;return String(Math.floor(d/60)).padStart(2,'0')+':'+String(d%60).padStart(2,'0');}
+function parseOffs(s){return (s==null||s===''?'15,5,0':String(s)).split(',').map(x=>parseInt(String(x).trim(),10)).filter(x=>!isNaN(x)&&x>=0&&x<=1440);}
+function setRap(v){var e=document.getElementById('eRappels');if(e)e.value=v;}
 function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 function helloWord(){const h=new Date().getHours();return (h>=18||h<6)?'Bonsoir':'Bonjour';}
 
@@ -586,9 +599,9 @@ function renderFocus(){
 }
 function openDetail(id){CUR=ACTIONS.find(a=>a.id===id);var ec=document.getElementById('editCard');if(ec)ec.style.display='none';renderDetail();navTo('detail');}
 async function addTask(){const titre=prompt('Nouvelle action pour '+SEGR+' (semaine '+CURW+') :');if(!titre||!titre.trim())return;const ordre=ACTIONS.filter(a=>a.semaine===CURW&&a.responsable===SEGR).length+1;const row={responsable:SEGR,mois:MONTH(CURW),semaine:CURW,ordre:ordre,titre:titre.trim(),priorite:'P2',duree:'',categorie:'',statut:'a_faire'};if(DEMO){row.id='n'+Math.random();ACTIONS.push(row);renderAll();openDetail(row.id);openEdit();return;}const {data,error}=await supa.from('actions').insert(row).select();if(error){toast('Ajout impossible');return;}if(data&&data[0]){ACTIONS.push(data[0]);notifyAssign(data[0].id);renderAll();openDetail(data[0].id);openEdit();toast('Précise la semaine, la date et l’heure');return;}renderAll();}
-function openEdit(){const c=document.getElementById('editCard');document.getElementById('eTitre').value=CUR.titre||'';document.getElementById('eResp').value=CUR.responsable||'Diana';document.getElementById('eSem').value=CUR.semaine||1;document.getElementById('eDate').value=CUR.date_prevue||'';document.getElementById('eHeure').value=CUR.heure_prevue||'';document.getElementById('eDuree').value=CUR.duree||'';document.getElementById('ePrio').value=CUR.priorite||'P2';document.getElementById('eCat').value=CUR.categorie||'';c.style.display='block';}
+function openEdit(){const c=document.getElementById('editCard');document.getElementById('eTitre').value=CUR.titre||'';document.getElementById('eResp').value=CUR.responsable||'Diana';document.getElementById('eSem').value=CUR.semaine||1;document.getElementById('eDate').value=CUR.date_prevue||'';document.getElementById('eHeure').value=CUR.heure_prevue||'';document.getElementById('eRappels').value=CUR.rappels||'15,5,0';document.getElementById('eDuree').value=CUR.duree||'';document.getElementById('ePrio').value=CUR.priorite||'P2';document.getElementById('eCat').value=CUR.categorie||'';c.style.display='block';}
 function toggleEdit(){const c=document.getElementById('editCard');if(c.style.display==='none'){openEdit();}else{c.style.display='none';}}
-async function saveEdit(){const newResp=document.getElementById('eResp').value;const newSem=Number(document.getElementById('eSem').value)||CUR.semaine||1;const changed=newResp!==CUR.responsable;const patch={titre:(document.getElementById('eTitre').value.trim()||CUR.titre),responsable:newResp,semaine:newSem,mois:MONTH(newSem),date_prevue:document.getElementById('eDate').value||null,heure_prevue:document.getElementById('eHeure').value||null,duree:document.getElementById('eDuree').value.trim(),priorite:document.getElementById('ePrio').value,categorie:document.getElementById('eCat').value.trim()};await persist(CUR.id,patch);document.getElementById('editCard').style.display='none';renderDetail();if(changed){notifyAssign(CUR.id);toast('Assignée à '+newResp);}else{toast('Action enregistrée');}}
+async function saveEdit(){const newResp=document.getElementById('eResp').value;const newSem=Number(document.getElementById('eSem').value)||CUR.semaine||1;const changed=newResp!==CUR.responsable;const patch={titre:(document.getElementById('eTitre').value.trim()||CUR.titre),responsable:newResp,semaine:newSem,mois:MONTH(newSem),date_prevue:document.getElementById('eDate').value||null,heure_prevue:document.getElementById('eHeure').value||null,rappels:(document.getElementById('eRappels').value.trim()||'15,5,0'),duree:document.getElementById('eDuree').value.trim(),priorite:document.getElementById('ePrio').value,categorie:document.getElementById('eCat').value.trim()};await persist(CUR.id,patch);document.getElementById('editCard').style.display='none';renderDetail();if(changed){notifyAssign(CUR.id);toast('Assignée à '+newResp);}else{toast('Action enregistrée');}}
 async function deleteTask(){if(!confirm('Supprimer définitivement cette action ?'))return;const id=CUR.id;ACTIONS=ACTIONS.filter(a=>a.id!==id);if(!DEMO){const {error}=await supa.from('actions').delete().eq('id',id);if(error){toast('Suppression impossible');}}renderAll();history.back();toast('Action supprimée');}
 function renderApercu(){let rows=APM===0?ACTIONS.slice():ACTIONS.filter(a=>a.mois===APM);if(APS!=='all')rows=rows.filter(a=>a.statut===APS);const done=rows.filter(a=>a.statut==='fait').length;const pct=rows.length?Math.round(done/rows.length*100):0;const sm=document.getElementById('apSummary');if(sm){sm.innerHTML='<div class="hrow"><b style="font-size:14px">'+(APM===0?'Les 6 mois':'Mois '+APM)+'</b><span style="font-weight:800">'+done+' / '+rows.length+' · '+pct+'%</span></div><div class="track" style="margin-top:8px"><i style="width:'+pct+'%"></i></div>';}const byW={};rows.forEach(a=>{(byW[a.semaine]=byW[a.semaine]||[]).push(a);});const weeks=Object.keys(byW).map(Number).sort((a,b)=>a-b);const SP={a_faire:['st-todo','À faire'],en_cours:['st-prog','En cours'],fait:['st-done','Fait']};let h='';weeks.forEach(w=>{h+='<div class="section-title" style="margin-top:14px">Semaine '+w+' · Mois '+MONTH(w)+'</div>';byW[w].sort((a,b)=>a.responsable.localeCompare(b.responsable)||((a.ordre||0)-(b.ordre||0)));h+=byW[w].map(a=>{const sp=SP[a.statut]||SP.a_faire;return '<div class="task" style="padding:10px" onclick="openDetail(\''+a.id+'\')"><div style="flex:1"><p class="tt" style="font-size:12.5px">'+esc(a.titre)+'</p><div class="tmeta"><span class="owner '+RCLS[a.responsable]+'">'+a.responsable+'</span><span class="stat-pill '+sp[0]+'">'+sp[1]+'</span></div></div><span class="chev"><svg class="i" style="width:16px"><use href="#chev"/></svg></span></div>';}).join('');});const el=document.getElementById('apList');if(el)el.innerHTML=h||'<div class="empty">Aucune action.</div>';}
 function renderDetail(){
@@ -608,11 +621,14 @@ function renderDetail(){
 function fmtDate(d){try{return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});}catch(e){return d;}}
 function renderRem(){
   const a=CUR,el=document.getElementById('dRem');
-  if(!a.heure_prevue){el.innerHTML='<p class="sub">Aucune heure définie. Choisis une heure : des rappels seront programmés à 15 min et 5 min avant, puis à l’heure prévue.</p>';return;}
+  if(!a.heure_prevue){el.innerHTML='<p class="sub">Aucune heure définie. Ajoute une heure dans « Modifier » pour programmer des rappels.</p>';return;}
   const t=a.heure_prevue;
   const line=(txt,tm)=>'<div class="reminder" style="margin-bottom:8px"><span class="ric"><svg class="i"><use href="#bell"/></svg></span><div style="flex:1"><b>'+txt+'</b><div class="sub">à '+tm+'</div></div><span class="stat-pill st-done">✓</span></div>';
   const dn=a.date_prevue?'<p class="sub" style="margin:0 0 10px;font-weight:700;color:var(--ink)">Le '+fmtDate(a.date_prevue)+'</p>':'<p class="sub" style="margin:0 0 10px">Chaque jour tant que non fait</p>';
-  el.innerHTML=dn+line('15 minutes avant',offMin(t,15))+line('5 minutes avant',offMin(t,5))+line('À l’heure prévue',t)
+  const offs=parseOffs(a.rappels).sort((x,y)=>y-x);
+  let rowsr=offs.map(o=>line(o===0?'À l’heure prévue':(o+' min avant'),offMin(t,o))).join('');
+  if(!rowsr)rowsr='<p class="sub">Aucun rappel configuré.</p>';
+  el.innerHTML=dn+rowsr
     +'<div class="channels"><span class="chan on">Push</span><span class="chan on">In-app</span><span class="chan off">SMS · bientôt</span><span class="chan off">WhatsApp · bientôt</span></div>';
 }
 function renderRevue(){
