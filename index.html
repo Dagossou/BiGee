@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#101F28">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BiGee">
+<title>BiGee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#3CDE4B; --green-ink:#0A2110;
+  --diana:#FF7A59; --daniel:#35D6C4; --couple:#A87CFF;
+  --nuit:#101F28; --papier:#F4F7F6;
+  --font:'Montserrat',-apple-system,"Segoe UI",Roboto,system-ui,sans-serif;
+  --bg:#ECF1EF; --card:#FFFFFF; --ink:#101F28; --muted:#5E7076; --line:#E2E8E5;
+  --chip:#EDF1F0; --chip-tx:#5E7076;
+  --diana-bg:#FFE7DF; --diana-tx:#C0492E; --daniel-bg:#DBF6F2; --daniel-tx:#0E766B;
+  --couple-bg:#EEE7FF; --couple-tx:#5B3D9E; --green-bg:#E1F8E4; --green-tx:#1B7A2A;
+  --coral:#FF7A59; --coral-bg:#FFE7DF; --coral-tx:#C0492E;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0C1922; --card:#182B35; --ink:#F4F7F6; --muted:#9DB0B4; --line:#263A44;
+  --chip:#213640; --chip-tx:#9DB0B4;
+  --diana-bg:#3A2A26; --diana-tx:#FF9E86; --daniel-bg:#123430; --daniel-tx:#5CE6D6;
+  --couple-bg:#2A2447; --couple-tx:#C3A6FF; --green-bg:#153223; --green-tx:#5CE87A;
+  --coral:#FF7A59; --coral-bg:#3A2A26; --coral-tx:#FF9E86;
+}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:var(--font)}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);overflow:hidden}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
+.app{height:100dvh;max-width:520px;margin:0 auto;display:flex;flex-direction:column;position:relative;background:var(--bg)}
+
+/* setup / login / loading */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:26px;z-index:20;background:var(--bg);overflow-y:auto}
+.screen.hide{display:none}
+.brandbig{display:flex;align-items:center;gap:11px;font-weight:800;font-size:22px;letter-spacing:-.5px;margin-bottom:6px}
+.brandbig .logo{width:42px;height:42px;border-radius:13px;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center}
+.screen h1{font-size:20px;font-weight:800;margin:10px 0 4px}
+.screen p{color:var(--muted);font-size:13px;margin:0 0 8px;font-weight:500;line-height:1.55}
+label.lb{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);display:block;margin:14px 0 6px}
+input.tf{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:14px;background:var(--card);color:var(--ink)}
+input.tf:focus{outline:none;border-color:var(--green)}
+.btn{width:100%;border:none;border-radius:13px;padding:14px;font-size:14px;font-weight:800;background:var(--green);color:var(--green-ink);cursor:pointer;margin-top:16px}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);margin-top:10px}
+.hintbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px;font-size:12px;color:var(--muted);line-height:1.6}
+.hintbox b{color:var(--ink)}
+.msg{font-size:12.5px;margin-top:12px;padding:11px 13px;border-radius:11px;font-weight:600}
+.msg.ok{background:var(--green-bg);color:var(--green-tx)}.msg.err{background:var(--coral-bg);color:var(--coral-tx)}
+.spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--green);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* app chrome */
+.appbar{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top) + 10px) 18px 10px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;letter-spacing:-.4px}
+.brand .logo{width:30px;height:30px;border-radius:10px;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center}
+.ico-btn{width:36px;height:36px;border-radius:11px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink);cursor:pointer}
+.grp{display:flex;gap:8px}
+.body{flex:1;overflow-y:auto;padding:6px 16px 96px}
+.pane{display:none}.pane.on{display:block}
+.who{font-size:11px;color:var(--muted);font-weight:600;padding:0 2px 8px}
+.who b{color:var(--green-tx)}
+
+.greet h2{margin:2px 0 0;font-size:21px;font-weight:800;letter-spacing:-.5px}
+.greet p{margin:3px 0 12px;color:var(--muted);font-size:12.5px;font-weight:500}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:13px}
+.card h3{margin:0;font-size:12px;font-weight:800;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:.4px}
+.sub{color:var(--muted);font-size:11.5px;margin:2px 0 0;font-weight:500}
+.hrow{display:flex;align-items:center;justify-content:space-between}
+.feature{background:var(--nuit);color:var(--papier);border:none;border-radius:20px;padding:16px;position:relative;overflow:hidden}
+.feature .tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;background:rgba(60,222,75,.16);color:#8CF29A;padding:4px 9px;border-radius:20px}
+.feature h4{margin:11px 0 3px;font-size:17px;font-weight:800}
+.ringF{width:76px;height:76px;border-radius:50%;position:absolute;right:16px;top:50%;transform:translateY(-50%);background:conic-gradient(var(--green) calc(var(--p,0)*1%),rgba(255,255,255,.14) 0);display:flex;align-items:center;justify-content:center}
+.ringF b{width:58px;height:58px;border-radius:50%;background:var(--nuit);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:15px;font-weight:800}
+.ringF b small{font-size:8px;font-weight:600;opacity:.7}
+.perbar{margin-top:10px}
+.perbar .r{display:flex;justify-content:space-between;font-size:11.5px;margin:9px 0 4px;font-weight:600}
+.trk{height:8px;background:var(--chip);border-radius:20px;overflow:hidden}.trk i{display:block;height:100%;border-radius:20px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:13px}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px}
+.metric .msq{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.metric .val{font-size:22px;font-weight:800;margin-top:9px}.metric .lab{font-size:11px;color:var(--muted);font-weight:500}
+
+.seg{display:flex;background:var(--chip);border-radius:14px;padding:4px;margin:4px 0 12px}
+.seg button{flex:1;border:none;background:none;padding:9px 0;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+.seg button.act{background:var(--card);color:var(--ink)}
+.weeknav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.weeknav button{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.weeknav .wl{font-weight:800;font-size:14px}
+.task{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px;margin-bottom:10px;cursor:pointer}
+.chk{width:24px;height:24px;border-radius:8px;border:2px solid var(--line);flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.chk svg{width:14px;height:14px;stroke-width:3;opacity:0;stroke:var(--green-ink)}
+.task.done .chk{background:var(--green);border-color:var(--green)}.task.done .chk svg{opacity:1}
+.task.prog .chk{border-color:var(--green)}.task.prog .chk::after{content:"";width:8px;height:8px;border-radius:2px;background:var(--green)}
+.task .tt{font-size:13px;font-weight:600;line-height:1.35;margin:0}.task.done .tt{text-decoration:line-through;color:var(--muted)}
+.tmeta{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;align-items:center}
+.pill{font-size:9.5px;font-weight:800;padding:3px 7px;border-radius:20px}
+.P1{background:var(--coral-bg);color:var(--coral-tx)}.P2{background:var(--chip);color:var(--chip-tx)}.P3{background:var(--green-bg);color:var(--green-tx)}
+.dur{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:3px;font-weight:600}.dur svg{width:12px;height:12px}
+.owner{font-size:9.5px;font-weight:800;padding:3px 7px;border-radius:20px}
+.oDiana{background:var(--diana-bg);color:var(--diana-tx)}.oDaniel{background:var(--daniel-bg);color:var(--daniel-tx)}.oCouple{background:var(--couple-bg);color:var(--couple-tx)}
+.chev{margin-left:auto;color:var(--muted);align-self:center;opacity:.6}
+.empty{text-align:center;color:var(--muted);font-size:12.5px;padding:30px 10px;font-weight:600}
+
+.detail-head{display:flex;align-items:center;gap:11px;padding:2px 2px 12px;font-weight:800;font-size:15px}
+.back{width:36px;height:36px;border-radius:11px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink);cursor:pointer}
+.dtitle{font-size:17px;font-weight:800;margin:11px 0 4px;line-height:1.32}
+.dmeta{display:flex;gap:14px;flex-wrap:wrap;font-size:10.5px;color:var(--muted);margin-top:6px;font-weight:600}
+.dmeta span{display:flex;align-items:center;gap:5px}.dmeta svg{width:13px;height:13px}
+.substeps{margin:12px 0 0;padding:0;list-style:none}
+.substeps li{display:flex;gap:8px;font-size:12px;color:var(--ink);padding:5px 0;font-weight:600}
+.substeps li svg{width:15px;height:15px;stroke:var(--green);flex:none;margin-top:1px}
+.chips{display:flex;gap:8px;margin-top:12px}
+.chips button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 0;font-size:11.5px;font-weight:800;color:var(--muted);cursor:pointer}
+.chips button.act{background:var(--chip);color:var(--ink)}
+.chips button.act.done{background:var(--green);color:var(--green-ink);border-color:var(--green)}
+.chips button.act.prog{background:var(--green-bg);color:var(--green-tx);border-color:var(--green-bg)}
+input[type=time]{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:15px;font-weight:700;color:var(--ink);background:var(--bg);margin-top:10px}
+input[type=time]:focus{outline:none;border-color:var(--green)}
+.reminder{display:flex;align-items:center;gap:11px;background:var(--bg);border:1px solid var(--line);border-radius:13px;padding:12px}
+.ric{width:36px;height:36px;border-radius:11px;background:var(--green-bg);color:var(--green-tx);display:flex;align-items:center;justify-content:center;flex:none}
+.reminder b{font-size:12.5px;font-weight:800}
+.channels{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.chan{font-size:10px;font-weight:800;padding:5px 9px;border-radius:20px}.chan.on{background:var(--green-bg);color:var(--green-tx)}.chan.off{background:var(--chip);color:var(--muted)}
+.cta{width:100%;border:none;border-radius:15px;padding:14px;font-size:14px;font-weight:800;color:var(--green-ink);background:var(--green);cursor:pointer}
+.stat-pill{font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:20px}.st-done{background:var(--green);color:var(--green-ink)}
+
+.nav{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;padding:8px 0 calc(env(safe-area-inset-bottom) + 8px)}
+.nav button{border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:9.5px;font-weight:700;cursor:pointer}
+.nav button svg{width:22px;height:22px}.nav button.act{color:var(--green-tx)}
+.nav .fab{margin-top:-24px}.nav .fab .fabic{width:52px;height:52px;border-radius:17px;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--nuit);color:var(--papier);padding:10px 16px;border-radius:12px;font-size:12px;font-weight:700;opacity:0;transition:.25s;z-index:60;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 19a2 2 0 0 0 4 0"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></symbol>
+<symbol id="list" viewBox="0 0 24 24"><path d="M4 7l1.6 1.6L8 6"/><path d="M4 13l1.6 1.6L8 12"/><path d="M11 7h9M11 13h9M11 18h6"/></symbol>
+<symbol id="bolt" viewBox="0 0 24 24"><path d="M13 3L5 13h6l-1 8 8-11h-6l1-7z"/></symbol>
+<symbol id="calendar" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M4 9.5h16M8 3v4M16 3v4"/></symbol>
+<symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6"/></symbol>
+<symbol id="trend" viewBox="0 0 24 24"><path d="M4 15l5-5 4 4 7-8"/><path d="M17 6h4v4"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M16 6a3 3 0 0 1 0 6M22 20c0-2.5-2-4.2-4-4.6"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+<symbol id="chevrons" viewBox="0 0 24 24"><path d="M5 6l5 6-5 6"/><path d="M12 6l5 6-5 6"/></symbol>
+<symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></symbol>
+<symbol id="logout" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 12H3M6 8l-3 4 3 4"/></symbol>
+<symbol id="flag" viewBox="0 0 24 24"><path d="M6 21V4h11l-2 4 2 4H6"/></symbol>
+<symbol id="left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+<symbol id="right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+</defs></svg>
+
+<div class="app">
+
+  <!-- CONFIG -->
+  <div class="screen" id="screen-config">
+    <div class="brandbig"><span class="logo"><svg class="i"><use href="#chevrons"/></svg></span>BiGee</div>
+    <h1>Connexion à votre base</h1>
+    <p>Collez les deux valeurs de votre projet Supabase (une seule fois par appareil). On les trouve dans Supabase → <b>Settings → API</b>.</p>
+    <label class="lb">Project URL</label>
+    <input class="tf" id="cfgUrl" placeholder="https://xxxx.supabase.co" autocomplete="off">
+    <label class="lb">Clé anon (public)</label>
+    <input class="tf" id="cfgKey" placeholder="eyJhbGciOi..." autocomplete="off">
+    <button class="btn" onclick="saveConfig()">Connecter</button>
+    <button class="btn ghost" onclick="startDemo()">Essayer en mode démo (sans compte)</button>
+    <div class="hintbox">La <b>clé anon</b> est publique par nature : elle est protégée par les règles de sécurité de la base. Rien de secret ici.</div>
+    <div id="cfgMsg"></div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="screen hide" id="screen-login">
+    <div class="brandbig"><span class="logo"><svg class="i"><use href="#chevrons"/></svg></span>BiGee</div>
+    <h1>Se connecter</h1>
+    <p>Entrez votre email (celui de Diana ou de Daniel). Vous recevrez un lien magique — un clic et c'est bon, sans mot de passe.</p>
+    <label class="lb">Votre email</label>
+    <input class="tf" id="loginEmail" type="email" placeholder="diana@email.com" autocomplete="email">
+    <button class="btn" onclick="sendLink()">Recevoir mon lien</button>
+    <button class="btn ghost" onclick="resetConfig()">Changer de base</button>
+    <div id="loginMsg"></div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="screen hide" id="screen-loading"><div class="spin"></div><p style="text-align:center;margin-top:16px">Chargement…</p></div>
+
+  <!-- APP -->
+  <div class="screen hide" id="screen-app" style="padding:0;position:relative;display:flex;flex-direction:column">
+    <div class="appbar">
+      <div class="brand"><span class="logo"><svg class="i"><use href="#chevrons"/></svg></span>BiGee</div>
+      <div class="grp"><div class="ico-btn" onclick="location.reload()"><svg class="i"><use href="#bell"/></svg></div><div class="ico-btn" onclick="logout()"><svg class="i"><use href="#logout"/></svg></div></div>
+    </div>
+    <div class="body">
+      <div class="who" id="who"></div>
+
+      <div class="pane on" id="p-accueil">
+        <div class="greet"><h2 id="gTitle">Bonjour</h2><p id="gDate"></p></div>
+        <div class="metrics">
+          <div class="metric"><div class="msq" style="background:var(--green-bg);color:var(--green-tx)"><svg class="i"><use href="#check"/></svg></div><div class="val" id="mDone">0</div><div class="lab" id="mDoneL">Actions faites</div></div>
+          <div class="metric"><div class="msq" style="background:var(--couple-bg);color:var(--couple-tx)"><svg class="i"><use href="#bolt"/></svg></div><div class="val" id="mWeek">0</div><div class="lab">Faites cette semaine</div></div>
+        </div>
+        <div class="card feature">
+          <span class="tag">Semaine en cours</span>
+          <h4 id="fWeek">Semaine 1</h4>
+          <div class="ringF" style="--p:0"><b id="fRing">0%<small>avancé</small></b></div>
+        </div>
+        <div class="card">
+          <h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#users"/></svg> Progression — à deux</h3>
+          <div class="perbar" id="perbar"></div>
+        </div>
+      </div>
+
+      <div class="pane" id="p-semaine">
+        <div class="weeknav">
+          <button onclick="chgWeek(-1)"><svg class="i"><use href="#left"/></svg></button>
+          <span class="wl" id="wLabel">Semaine 1 · Mois 1</span>
+          <button onclick="chgWeek(1)"><svg class="i"><use href="#right"/></svg></button>
+        </div>
+        <div class="seg" id="segWeek">
+          <button class="act" data-r="Diana">Diana</button>
+          <button data-r="Daniel">Daniel</button>
+          <button data-r="Couple">Couple</button>
+        </div>
+        <div id="weekList"></div>
+      </div>
+
+      <div class="pane" id="p-detail">
+        <div class="detail-head"><button class="back" onclick="show('semaine')"><svg class="i"><use href="#back"/></svg></button><span>Détail de l'action</span></div>
+        <div class="card">
+          <div style="display:flex;gap:6px"><span class="owner" id="dOwner"></span><span class="pill" id="dPrio"></span></div>
+          <div class="dtitle" id="dTitle"></div>
+          <div class="dmeta" id="dMeta"></div>
+          <ul class="substeps" id="dSubs"></ul>
+        </div>
+        <div class="card"><h3>Statut</h3><div class="chips" id="dStatus"></div></div>
+        <div class="card">
+          <h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#clock"/></svg> Heure prévue</h3>
+          <p class="sub">Choisis quand tu comptes réaliser cette action</p>
+          <input type="time" id="dTime" onchange="setHeure()">
+        </div>
+        <div class="card"><h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#bell"/></svg> Rappels</h3><div id="dRem" style="margin-top:10px"></div></div>
+      </div>
+
+      <div class="pane" id="p-objectifs">
+        <div class="card">
+          <h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#target"/></svg> Indicateurs de progression</h3>
+          <div class="perbar" id="objInd"></div>
+        </div>
+        <div class="card">
+          <h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#trend"/></svg> Objectif — Daniel</h3>
+          <p class="sub">Revenu régulier ≥ 500 $/mois d'ici le mois 6</p>
+          <div class="perbar"><div class="r"><span>Progression vers l'objectif</span><span id="objDanielPct">0%</span></div><div class="trk"><i id="objDaniel" style="background:var(--green)"></i></div></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="nav">
+      <button class="act" data-p="accueil"><svg class="i"><use href="#home"/></svg>Accueil</button>
+      <button data-p="semaine"><svg class="i"><use href="#list"/></svg>Semaine</button>
+      <button class="fab" data-p="objectifs"><span class="fabic"><svg class="i"><use href="#target"/></svg></span></button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const LS={url:'bigee_url',key:'bigee_key',week:'bigee_week'};
+let supa=null, DEMO=false, USER=null, ACTIONS=[], CURW=+(localStorage.getItem(LS.week)||1), SEGR='Diana', CUR=null;
+const MONTH=w=>Math.ceil(w/4);
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800);}
+function scr(id){['config','login','loading','app'].forEach(s=>document.getElementById('screen-'+s).classList.toggle('hide',s!==id));}
+function minus30(t){let[h,m]=t.split(':').map(Number);let d=h*60+m-30;if(d<0)d+=1440;return String(Math.floor(d/60)).padStart(2,'0')+':'+String(d%60).padStart(2,'0');}
+
+/* ---------- config / auth ---------- */
+function saveConfig(){
+  const u=document.getElementById('cfgUrl').value.trim(), k=document.getElementById('cfgKey').value.trim();
+  if(!u||!k){document.getElementById('cfgMsg').innerHTML='<div class="msg err">Renseigne les deux champs.</div>';return;}
+  localStorage.setItem(LS.url,u);localStorage.setItem(LS.key,k);boot();
+}
+function resetConfig(){localStorage.removeItem(LS.url);localStorage.removeItem(LS.key);location.reload();}
+function startDemo(){DEMO=true;USER={email:'demo@bigee.app'};ACTIONS=demoData();scr('app');initApp();}
+async function sendLink(){
+  const email=document.getElementById('loginEmail').value.trim();
+  if(!email){document.getElementById('loginMsg').innerHTML='<div class="msg err">Entre ton email.</div>';return;}
+  const {error}=await supa.auth.signInWithOtp({email,options:{emailRedirectTo:location.href.split('#')[0]}});
+  document.getElementById('loginMsg').innerHTML = error
+    ? '<div class="msg err">'+error.message+'</div>'
+    : '<div class="msg ok">Lien envoyé ! Ouvre ton email sur cet appareil et clique le lien.</div>';
+}
+async function logout(){ if(supa) await supa.auth.signOut(); location.reload(); }
+
+async function boot(){
+  const url=localStorage.getItem(LS.url), key=localStorage.getItem(LS.key);
+  if(!url||!key){scr('config');return;}
+  try{
+    supa=window.supabase.createClient(url,key);
+  }catch(e){document.getElementById('cfgMsg').innerHTML='<div class="msg err">URL invalide.</div>';scr('config');return;}
+  scr('loading');
+  supa.auth.onAuthStateChange((_e,session)=>{ route(session); });
+  const {data}=await supa.auth.getSession();
+  route(data.session);
+}
+async function route(session){
+  if(!session){scr('login');return;}
+  USER=session.user;scr('loading');
+  await loadActions();
+  subscribe();
+  scr('app');initApp();
+}
+async function loadActions(){
+  const {data,error}=await supa.from('actions').select('*').order('semaine').order('responsable').order('ordre');
+  if(error){toast('Erreur de chargement');ACTIONS=[];return;}
+  ACTIONS=data||[];
+}
+function subscribe(){
+  supa.channel('bigee-actions')
+    .on('postgres_changes',{event:'*',schema:'public',table:'actions'},async ()=>{ await loadActions(); renderAll(); })
+    .subscribe();
+}
+
+/* ---------- data helpers ---------- */
+const RESP=['Diana','Daniel','Couple'];
+const RCLS={Diana:'oDiana',Daniel:'oDaniel',Couple:'oCouple'};
+function doneOf(r){return ACTIONS.filter(a=>a.responsable===r&&a.statut==='fait').length;}
+function totOf(r){return ACTIONS.filter(a=>a.responsable===r).length;}
+async function persist(id,patch){
+  const a=ACTIONS.find(x=>x.id===id); if(a)Object.assign(a,patch); renderAll();
+  if(DEMO)return;
+  const {error}=await supa.from('actions').update(patch).eq('id',id);
+  if(error)toast('Sauvegarde impossible');
+}
+function cycle(id){
+  const a=ACTIONS.find(x=>x.id===id); const nx={a_faire:'en_cours',en_cours:'fait',fait:'a_faire'}[a.statut];
+  persist(id,{statut:nx, fait_le: nx==='fait'?new Date().toISOString():null, fait_par: nx==='fait'?(USER&&USER.id||null):null});
+}
+function setStatut(s){persist(CUR.id,{statut:s, fait_le:s==='fait'?new Date().toISOString():null});renderDetail();}
+function setHeure(){
+  const t=document.getElementById('dTime').value||null;
+  persist(CUR.id,{heure_prevue:t, rappel_at:t?minus30(t):null});
+  renderRem(); toast(t?('Rappel programmé à '+minus30(t)):'Heure retirée');
+}
+
+/* ---------- render ---------- */
+function initApp(){
+  document.getElementById('who').innerHTML = DEMO?'Mode démo — <b>données non synchronisées</b>':'Connecté : <b>'+USER.email+'</b> · synchronisé';
+  document.querySelectorAll('.nav button[data-p]').forEach(b=>b.onclick=()=>show(b.dataset.p));
+  document.querySelectorAll('#segWeek button').forEach(b=>b.onclick=()=>{SEGR=b.dataset.r;document.querySelectorAll('#segWeek button').forEach(x=>x.classList.toggle('act',x===b));renderWeek();});
+  const d=new Date();document.getElementById('gDate').textContent=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('gTitle').textContent='Bonjour Diana & Daniel';
+  renderAll();show('accueil');
+}
+function show(p){
+  document.querySelectorAll('.pane').forEach(e=>e.classList.remove('on'));
+  document.getElementById('p-'+p).classList.add('on');
+  document.querySelectorAll('.nav button[data-p]').forEach(b=>b.classList.toggle('act',b.dataset.p===p));
+  document.querySelector('.body').scrollTop=0;
+}
+function renderAll(){renderAccueil();renderWeek();renderObj();}
+function renderAccueil(){
+  const totDone=doneOf('Diana')+doneOf('Daniel')+doneOf('Couple');
+  const totAll=ACTIONS.length||1;
+  document.getElementById('mDone').textContent=totDone;
+  document.getElementById('mDoneL').textContent='Actions faites / '+ACTIONS.length;
+  const wk=ACTIONS.filter(a=>a.semaine===CURW);
+  document.getElementById('mWeek').textContent=wk.filter(a=>a.statut==='fait').length;
+  document.getElementById('fWeek').textContent='Semaine '+CURW+' · Mois '+MONTH(CURW);
+  const wpct=wk.length?Math.round(wk.filter(a=>a.statut==='fait').length/wk.length*100):0;
+  document.querySelector('.ringF').style.setProperty('--p',wpct);
+  document.getElementById('fRing').innerHTML=wpct+'%<small>avancé</small>';
+  const cols={Diana:'var(--diana)',Daniel:'var(--daniel)',Couple:'var(--couple)'};
+  document.getElementById('perbar').innerHTML=RESP.map(r=>{
+    const d=doneOf(r),t=totOf(r)||1,p=Math.round(d/t*100);
+    return `<div class="r"><span style="color:${cols[r]}">${r}</span><span style="color:var(--muted)">${d}/${totOf(r)}</span></div><div class="trk"><i style="width:${p}%;background:${cols[r]}"></i></div>`;
+  }).join('');
+}
+function renderWeek(){
+  document.getElementById('wLabel').textContent='Semaine '+CURW+' · Mois '+MONTH(CURW);
+  const rows=ACTIONS.filter(a=>a.semaine===CURW&&a.responsable===SEGR).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
+  const el=document.getElementById('weekList');
+  if(!rows.length){el.innerHTML='<div class="empty">Aucune action ici.<br>Vérifie que la base est bien remplie.</div>';return;}
+  el.innerHTML=rows.map(taskHTML).join('');
+}
+function taskHTML(a){
+  const cls=a.statut==='fait'?'done':a.statut==='en_cours'?'prog':'';
+  return `<div class="task ${cls}" onclick="openDetail('${a.id}')">
+    <div class="chk" onclick="event.stopPropagation();cycle('${a.id}')"><svg class="i"><use href="#check"/></svg></div>
+    <div style="flex:1"><p class="tt">${esc(a.titre)}</p>
+      <div class="tmeta"><span class="owner ${RCLS[a.responsable]}">${a.responsable}</span>
+        <span class="pill ${a.priorite}">${a.priorite||''}</span>
+        <span class="dur"><svg class="i"><use href="#clock"/></svg>${esc(a.duree||'')}</span>
+        ${a.heure_prevue?`<span class="dur" style="color:var(--green-tx)"><svg class="i"><use href="#bell"/></svg>${a.heure_prevue}</span>`:''}
+      </div></div>
+    <span class="chev"><svg class="i" style="width:16px"><use href="#chev"/></svg></span></div>`;
+}
+function openDetail(id){CUR=ACTIONS.find(a=>a.id===id);renderDetail();show('detail');}
+function renderDetail(){
+  const a=CUR;
+  const o=document.getElementById('dOwner');o.textContent=a.responsable;o.className='owner '+RCLS[a.responsable];
+  const p=document.getElementById('dPrio');p.textContent=a.priorite||'';p.className='pill '+(a.priorite||'');
+  document.getElementById('dTitle').textContent=a.titre;
+  document.getElementById('dMeta').innerHTML=`<span><svg class="i"><use href="#calendar"/></svg> Semaine ${a.semaine}</span><span><svg class="i"><use href="#list"/></svg> ${esc(a.categorie||'')}</span><span><svg class="i"><use href="#clock"/></svg> ${esc(a.duree||'')}</span>`;
+  const subs=(a.sous_etapes||'').split('•').map(s=>s.trim()).filter(Boolean);
+  document.getElementById('dSubs').innerHTML=subs.map(s=>`<li><svg class="i"><use href="#check"/></svg>${esc(s)}</li>`).join('')+(a.dod?`<li style="color:var(--muted)"><svg class="i" style="stroke:var(--muted)"><use href="#flag"/></svg>Fini quand : ${esc(a.dod)}</li>`:'');
+  const labels=[['a_faire','À faire',''],['en_cours','En cours','prog'],['fait','Fait','done']];
+  document.getElementById('dStatus').innerHTML=labels.map(([v,l,c])=>`<button class="${a.statut===v?'act '+c:''}" onclick="setStatut('${v}')">${l}</button>`).join('');
+  document.getElementById('dTime').value=a.heure_prevue||'';
+  renderRem();
+}
+function renderRem(){
+  const a=CUR,el=document.getElementById('dRem');
+  if(!a.heure_prevue){el.innerHTML='<p class="sub">Aucune heure définie. Choisis une heure : un rappel sera programmé automatiquement 30 min avant.</p>';return;}
+  el.innerHTML=`<div class="reminder"><span class="ric"><svg class="i"><use href="#bell"/></svg></span><div style="flex:1"><b>Rappel automatique</b><div class="sub">30 min avant · à ${minus30(a.heure_prevue)}</div></div><span class="stat-pill st-done">Programmé</span></div>
+    <div class="channels"><span class="chan on">Push</span><span class="chan on">In-app</span><span class="chan off">SMS · bientôt</span><span class="chan off">WhatsApp · bientôt</span></div>`;
+}
+function renderObj(){
+  const totDone=doneOf('Diana')+doneOf('Daniel')+doneOf('Couple');
+  const pct=ACTIONS.length?Math.round(totDone/ACTIONS.length*100):0;
+  document.getElementById('objInd').innerHTML=
+    `<div class="r"><span>Actions du plan faites</span><span>${pct}%</span></div><div class="trk"><i style="width:${pct}%;background:var(--green)"></i></div>`+
+    RESP.map(r=>{const d=doneOf(r),t=totOf(r)||1;return `<div class="r"><span>${r}</span><span>${d}/${totOf(r)}</span></div><div class="trk"><i style="width:${Math.round(d/t*100)}%;background:var(--green)"></i></div>`;}).join('');
+  const dn=totOf('Daniel')||1, dd=doneOf('Daniel'), dp=Math.round(dd/dn*100);
+  document.getElementById('objDaniel').style.width=dp+'%';
+  document.getElementById('objDanielPct').textContent=dp+'%';
+}
+function chgWeek(d){CURW=Math.min(24,Math.max(1,CURW+d));localStorage.setItem(LS.week,CURW);renderWeek();renderAccueil();}
+function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+
+/* ---------- demo ---------- */
+function demoData(){
+  const mk=(r,sem,ord,titre,prio,dur,cat,dod,subs,statut)=>({id:r+sem+ord+Math.random(),responsable:r,semaine:sem,mois:MONTH(sem),ordre:ord,titre,priorite:prio,duree:dur,categorie:cat,dod,sous_etapes:subs,statut,heure_prevue:null});
+  const A=[];
+  A.push(mk('Diana',1,1,'Actualiser le CV avec les 6 derniers mois.','P1','1h30','Carrière','CV à jour exporté en PDF.','Rassembler les infos • Réécrire l\'accroche • Choisir un modèle','fait'));
+  A.push(mk('Diana',1,2,'Contacter directement 3 entreprises.','P1','1h','Carrière','3 contacts réalisés.','Choisir 3 entreprises • Préparer l\'accroche • Contacter','en_cours'));
+  A.push(mk('Diana',1,3,'Actualiser le suivi des candidatures.','P3','20 min','Carrière','Suivi à jour.','Mettre à jour • Marquer les relances • Nettoyer','a_faire'));
+  A.push(mk('Daniel',1,1,'Contacter 5 prospects pour le revenu.','P1','1h','Revenu','≥5 contacts envoyés.','Choisir 5 contacts • Message personnalisé • Tracer','a_faire'));
+  A.push(mk('Daniel',1,2,'Produire un contenu simple prêt à publier.','P1','1h30','Contenu','1 contenu finalisé.','Filmer/écrire • Montage • Export','a_faire'));
+  A.push(mk('Daniel',1,3,'Préparer une publication.','P2','40 min','Branding','1 publication prête.','Visuel • Légende • Programmer','fait'));
+  A.push(mk('Couple',1,1,'Suivi des réponses (relances).','P2','20 min','Coordination','Suivi actif.','Colonne réponse • Noter • Relance J+5','a_faire'));
+  A.push(mk('Couple',1,2,'Point d\'avancement ensemble.','P2','20 min','Coordination','Point documenté.','Prévu vs réalisé • Blocages • Ajuster','en_cours'));
+  A.push(mk('Couple',1,3,'Célébrer les 1res actions faites.','P3','15 min','Motivation','Point de motivation tenu.','Lister • Se féliciter • Cap S+1','fait'));
+  return A;
+}
+
+/* register SW */
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+boot();
+</script>
+</body>
+</html>
