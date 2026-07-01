@@ -245,18 +245,26 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
     <div id="loginMsg"></div>
   </div>
 
+  <div class="screen hide" id="screen-identity">
+    <div class="brandbig"><span class="logo"><svg class="i"><use href="#chevrons"/></svg></span>BiGee</div>
+    <h1>Qui es-tu ?</h1>
+    <p>Choisis ton profil pour personnaliser ton accueil. (Une seule fois.)</p>
+    <button class="btn" style="background:var(--diana);color:#3A1206" onclick="pickWho('Diana')">Je suis Diana</button>
+    <button class="btn" style="background:var(--daniel);color:#043430;margin-top:10px" onclick="pickWho('Daniel')">Je suis Daniel</button>
+  </div>
+
   <div class="screen hide" id="screen-loading"><div class="spin"></div><p style="text-align:center;margin-top:16px">Chargement…</p></div>
 
   <div class="screen hide" id="screen-app">
     <div class="appbar">
       <div class="brand"><span class="logo"><svg class="i"><use href="#chevrons"/></svg></span>BiGee</div>
-      <div class="grp"><div class="ico-btn" onclick="location.reload()"><svg class="i"><use href="#bell"/></svg></div><div class="ico-btn" onclick="logout()"><svg class="i"><use href="#logout"/></svg></div></div>
+      <div class="grp"><div class="ico-btn" onclick="enableNotifications()" title="Activer les rappels"><svg class="i"><use href="#bell"/></svg></div><div class="ico-btn" onclick="logout()"><svg class="i"><use href="#logout"/></svg></div></div>
     </div>
     <div class="body">
       <div class="who" id="who"></div>
 
       <div class="pane on" id="p-accueil">
-        <div class="greet"><h2>Bonjour Diana &amp; Daniel</h2><p id="gDate"></p></div>
+        <div class="greet"><h2 id="gHello">Bonjour</h2><p id="gDate"></p></div>
         <button class="btn-primary" onclick="show('revue')"><svg class="i"><use href="#users"/></svg> Faire le point ensemble</button>
         <div class="metrics">
           <div class="metric"><div class="top"><span class="msq" style="background:var(--green-bg);color:var(--green-tx)"><svg class="i"><use href="#check"/></svg></span><span class="up" id="mDoneBadge"><svg class="i" style="width:11px;height:11px"><use href="#trend"/></svg>0%</span></div><div class="val" id="mDone">0</div><div class="lab" id="mDoneL">Actions faites / 216</div></div>
@@ -366,18 +374,51 @@ const RESP=['Diana','Daniel','Couple'];
 const RCLS={Diana:'oDiana',Daniel:'oDaniel',Couple:'oCouple'};
 const COLS={Diana:'var(--diana)',Daniel:'var(--daniel)',Couple:'var(--couple)'};
 function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800);}
-function scr(id){['config','login','loading','app'].forEach(s=>document.getElementById('screen-'+s).classList.toggle('hide',s!==id));}
+function scr(id){['config','login','identity','loading','app'].forEach(s=>document.getElementById('screen-'+s).classList.toggle('hide',s!==id));}
+const VAPID_PUBLIC='BO7q1YlbChuPDQsC5G9twi-gShYTVSqGaWaM1m1rIc3LQPmYTynCp7qLymyvKJMc3Jf-N-ogSVgszeLSriA2OiY';
+function b64u(base64){const pad='='.repeat((4-base64.length%4)%4);const b=(base64+pad).replace(/-/g,'+').replace(/_/g,'/');const raw=atob(b);const arr=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);return arr;}
+async function savePush(sub){const j=sub.toJSON();const prenom=(USER&&USER.user_metadata&&USER.user_metadata.prenom)||null;await supa.from('push_subscriptions').upsert({endpoint:j.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth,user_id:(USER&&USER.id)||null,prenom:prenom},{onConflict:'endpoint'});}
+async function enableNotifications(){
+  if(DEMO){toast('Indisponible en mode démo');return;}
+  if(!('serviceWorker'in navigator)||!('PushManager'in window)){toast('Notifications non supportées ici');return;}
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){toast('Notifications refusées');return;}
+    const reg=await navigator.serviceWorker.ready;
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID_PUBLIC)});
+    await savePush(sub);toast('Rappels activés ✓');
+  }catch(e){toast('Échec activation notifications');}
+}
+async function refreshPush(){
+  if(DEMO||!('serviceWorker'in navigator)||!('PushManager'in window)||!('Notification'in window))return;
+  if(Notification.permission!=='granted')return;
+  try{const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID_PUBLIC)});await savePush(sub);}catch(e){}
+}
 function minus30(t){const p=t.split(':');let d=Number(p[0])*60+Number(p[1])-30;if(d<0)d+=1440;return String(Math.floor(d/60)).padStart(2,'0')+':'+String(d%60).padStart(2,'0');}
 function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 
 function saveConfig(){const u=document.getElementById('cfgUrl').value.trim(),k=document.getElementById('cfgKey').value.trim();if(!u||!k){document.getElementById('cfgMsg').innerHTML='<div class="msg err">Renseigne les deux champs.</div>';return;}localStorage.setItem(LS.url,u);localStorage.setItem(LS.key,k);boot();}
 function resetConfig(){localStorage.removeItem(LS.url);localStorage.removeItem(LS.key);location.reload();}
-function startDemo(){DEMO=true;USER={email:'demo@bigee.app'};ACTIONS=demoData();scr('app');initApp();}
+function startDemo(){DEMO=true;USER={email:'demo@bigee.app',user_metadata:{prenom:'Diana'}};ACTIONS=demoData();scr('app');initApp();}
 function toggleMode(){MODE=MODE==='signin'?'signup':'signin';document.getElementById('loginTitle').textContent=MODE==='signin'?'Se connecter':'Créer un compte';document.getElementById('loginSub').textContent=MODE==='signin'?'Entre ton email et ton mot de passe (celui de Diana ou de Daniel).':'Choisis un mot de passe (au moins 6 caractères) pour créer ton compte.';document.getElementById('loginBtn').textContent=MODE==='signin'?'Se connecter':'Créer le compte';document.getElementById('toggleMode').textContent=MODE==='signin'?'Créer un compte':'J’ai déjà un compte';document.getElementById('loginMsg').innerHTML='';}
 async function doAuth(){const email=document.getElementById('loginEmail').value.trim();const pass=document.getElementById('loginPass').value;const msg=document.getElementById('loginMsg');if(!email||!pass){msg.innerHTML='<div class="msg err">Renseigne ton email et ton mot de passe.</div>';return;}if(pass.length<6){msg.innerHTML='<div class="msg err">Le mot de passe doit faire au moins 6 caractères.</div>';return;}msg.innerHTML='<div class="msg ok">Un instant…</div>';let res;if(MODE==='signin')res=await supa.auth.signInWithPassword({email,password:pass});else res=await supa.auth.signUp({email,password:pass});if(res.error){msg.innerHTML='<div class="msg err">'+res.error.message+'</div>';return;}if(MODE==='signup'&&!res.data.session){msg.innerHTML='<div class="msg ok">Compte créé. Confirme l’email si demandé, puis connecte-toi.</div>';return;}}
 async function logout(){if(supa)await supa.auth.signOut();location.reload();}
 async function boot(){const url=localStorage.getItem(LS.url),key=localStorage.getItem(LS.key);if(!url||!key){scr('config');return;}try{supa=window.supabase.createClient(url,key);}catch(e){scr('config');return;}scr('loading');supa.auth.onAuthStateChange((_e,session)=>route(session));const {data}=await supa.auth.getSession();route(data.session);}
-async function route(session){if(!session){scr('login');return;}USER=session.user;scr('loading');await loadActions();subscribe();scr('app');initApp();}
+async function route(session){
+  if(!session){scr('login');return;}
+  USER=session.user;
+  const prenom=USER.user_metadata&&USER.user_metadata.prenom;
+  if(!prenom){scr('identity');return;}
+  scr('loading');await loadActions();subscribe();scr('app');initApp();
+}
+async function pickWho(name){
+  scr('loading');
+  try{await supa.auth.updateUser({data:{prenom:name}});}catch(e){}
+  if(!USER.user_metadata)USER.user_metadata={};
+  USER.user_metadata.prenom=name;
+  await loadActions();subscribe();scr('app');initApp();
+}
 async function loadActions(){const {data,error}=await supa.from('actions').select('*').order('semaine').order('responsable').order('ordre');if(error){toast('Erreur de chargement');ACTIONS=[];return;}ACTIONS=data||[];}
 function subscribe(){supa.channel('bigee-actions').on('postgres_changes',{event:'*',schema:'public',table:'actions'},async ()=>{await loadActions();renderAll();}).subscribe();}
 
@@ -393,7 +434,9 @@ function initApp(){
   document.querySelectorAll('.nav button[data-p]').forEach(b=>b.onclick=()=>show(b.dataset.p));
   document.querySelectorAll('#segWeek button').forEach(b=>b.onclick=()=>{SEGR=b.dataset.r;document.querySelectorAll('#segWeek button').forEach(x=>x.classList.toggle('act',x===b));renderWeek();});
   document.querySelectorAll('#segFocus button').forEach(b=>b.onclick=()=>{FOCR=b.dataset.r;document.querySelectorAll('#segFocus button').forEach(x=>x.classList.toggle('act',x===b));renderFocus();});
-  renderAll();show('accueil');
+  const prenom=(USER.user_metadata&&USER.user_metadata.prenom)||'Diana';
+  document.getElementById('gHello').textContent='Bonjour '+prenom;
+  renderAll();show('accueil');refreshPush();
 }
 function show(p){document.querySelectorAll('.pane').forEach(e=>e.classList.remove('on'));document.getElementById('p-'+p).classList.add('on');document.querySelectorAll('.nav button[data-p]').forEach(b=>b.classList.toggle('act',b.dataset.p===p));document.querySelector('.body').scrollTop=0;if(p!=='detail')CURPANE=p;}
 function back(){show(CURPANE);}
