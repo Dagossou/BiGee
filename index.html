@@ -241,7 +241,6 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
     <input class="tf" id="loginPass" type="password" placeholder="mot de passe" autocomplete="current-password">
     <button class="btn" id="loginBtn" onclick="doAuth()">Se connecter</button>
     <button class="btn ghost" id="toggleMode" onclick="toggleMode()">Créer un compte</button>
-    <button class="btn ghost" onclick="resetConfig()">Changer de base</button>
     <div id="loginMsg"></div>
   </div>
 
@@ -367,7 +366,11 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const LS={url:'bigee_url',key:'bigee_key',week:'bigee_week'};
+// ====== CONFIG BASE (figée dans l'app) ======
+const SUPA_URL='https://sapojxjmrzjrfjiejgwv.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhcG9qeGptcnpqcmZqaWVqZ3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4ODY5MzgsImV4cCI6MjA5ODQ2MjkzOH0.kHd3h70SrDgd1S1H4GRd2hm8lbtCpJpoH8zJOkVF340';
+// =============================================
+const LS={week:'bigee_week'};
 let supa=null, DEMO=false, USER=null, ACTIONS=[], CURW=Number(localStorage.getItem(LS.week)||1), SEGR='Diana', FOCR='Diana', CUR=null, CURPANE='accueil', MODE='signin';
 const MONTH=w=>Math.ceil(w/4);
 const RESP=['Diana','Daniel','Couple'];
@@ -404,7 +407,14 @@ function startDemo(){DEMO=true;USER={email:'demo@bigee.app',user_metadata:{preno
 function toggleMode(){MODE=MODE==='signin'?'signup':'signin';document.getElementById('loginTitle').textContent=MODE==='signin'?'Se connecter':'Créer un compte';document.getElementById('loginSub').textContent=MODE==='signin'?'Entre ton email et ton mot de passe (celui de Diana ou de Daniel).':'Choisis un mot de passe (au moins 6 caractères) pour créer ton compte.';document.getElementById('loginBtn').textContent=MODE==='signin'?'Se connecter':'Créer le compte';document.getElementById('toggleMode').textContent=MODE==='signin'?'Créer un compte':'J’ai déjà un compte';document.getElementById('loginMsg').innerHTML='';}
 async function doAuth(){const email=document.getElementById('loginEmail').value.trim();const pass=document.getElementById('loginPass').value;const msg=document.getElementById('loginMsg');if(!email||!pass){msg.innerHTML='<div class="msg err">Renseigne ton email et ton mot de passe.</div>';return;}if(pass.length<6){msg.innerHTML='<div class="msg err">Le mot de passe doit faire au moins 6 caractères.</div>';return;}msg.innerHTML='<div class="msg ok">Un instant…</div>';let res;if(MODE==='signin')res=await supa.auth.signInWithPassword({email,password:pass});else res=await supa.auth.signUp({email,password:pass});if(res.error){msg.innerHTML='<div class="msg err">'+res.error.message+'</div>';return;}if(MODE==='signup'&&!res.data.session){msg.innerHTML='<div class="msg ok">Compte créé. Confirme l’email si demandé, puis connecte-toi.</div>';return;}}
 async function logout(){if(supa)await supa.auth.signOut();location.reload();}
-async function boot(){const url=localStorage.getItem(LS.url),key=localStorage.getItem(LS.key);if(!url||!key){scr('config');return;}try{supa=window.supabase.createClient(url,key);}catch(e){scr('config');return;}scr('loading');supa.auth.onAuthStateChange((_e,session)=>route(session));const {data}=await supa.auth.getSession();route(data.session);}
+async function boot(){
+  if(SUPA_KEY.indexOf('COLLE_TA_CLE')>-1){document.getElementById('cfgMsg').innerHTML='<div class="msg err">Clé non configurée dans le code (SUPA_KEY).</div>';scr('config');return;}
+  try{supa=window.supabase.createClient(SUPA_URL,SUPA_KEY);}catch(e){scr('config');return;}
+  scr('loading');
+  supa.auth.onAuthStateChange((_e,session)=>route(session));
+  const {data}=await supa.auth.getSession();
+  route(data.session);
+}
 async function route(session){
   if(!session){scr('login');return;}
   USER=session.user;
