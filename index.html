@@ -338,9 +338,17 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
         <div class="card"><div style="display:flex;gap:6px"><span class="owner" id="dOwner"></span><span class="pill" id="dPrio"></span></div><div class="dtitle" id="dTitle"></div><div class="dmeta" id="dMeta"></div><ul class="substeps" id="dSubs"></ul>
           <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" style="margin:0;flex:1" onclick="toggleEdit()">Modifier</button><button class="btn ghost" style="margin:0;flex:1;color:var(--coral-tx);border-color:var(--coral)" onclick="deleteTask()">Supprimer</button></div>
         </div>
-        <div class="card" id="editCard" style="display:none"><h3>Modifier l'action</h3><input class="tf" id="eTitre" style="margin-top:8px" placeholder="Titre"><label class="lb" style="margin-top:10px">Assigner à</label><select id="eResp" class="tf"><option>Diana</option><option>Daniel</option><option>Couple</option></select><div style="display:flex;gap:8px;margin-top:8px"><input class="tf" id="eDuree" placeholder="Durée (ex. 1h)" style="flex:1"><select id="ePrio" class="tf" style="flex:1"><option>P1</option><option>P2</option><option>P3</option></select></div><input class="tf" id="eCat" placeholder="Catégorie" style="margin-top:8px"><button class="cta" style="margin-top:10px" onclick="saveEdit()">Enregistrer</button></div>
+        <div class="card" id="editCard" style="display:none"><h3 id="editTitle">Modifier l'action</h3>
+          <input class="tf" id="eTitre" style="margin-top:8px" placeholder="Titre">
+          <label class="lb" style="margin-top:10px">Assigner à</label>
+          <select id="eResp" class="tf"><option>Diana</option><option>Daniel</option><option>Couple</option></select>
+          <div style="display:flex;gap:8px;margin-top:8px"><div style="flex:1"><label class="lb" style="margin:0 0 6px">Semaine</label><select id="eSem" class="tf"></select></div><div style="flex:1"><label class="lb" style="margin:0 0 6px">Heure</label><input class="tf" id="eHeure" type="time"></div></div>
+          <label class="lb" style="margin-top:8px">Date (optionnel)</label><input class="tf" id="eDate" type="date">
+          <div style="display:flex;gap:8px;margin-top:8px"><input class="tf" id="eDuree" placeholder="Durée (ex. 1h)" style="flex:1"><select id="ePrio" class="tf" style="flex:1"><option>P1</option><option>P2</option><option>P3</option></select></div>
+          <input class="tf" id="eCat" placeholder="Catégorie" style="margin-top:8px">
+          <button class="cta" id="editSaveBtn" style="margin-top:12px" onclick="saveEdit()">Enregistrer</button>
+        </div>
         <div class="card"><h3>Statut</h3><div class="chips" id="dStatus"></div></div>
-        <div class="card"><h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#clock"/></svg> Heure prévue</h3><p class="sub">Choisis quand tu comptes réaliser cette action</p><input type="time" id="dTime" onchange="setHeure()"></div>
         <div class="card"><h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#bell"/></svg> Rappels</h3><div id="dRem" style="margin-top:10px"></div></div>
       </div>
 
@@ -478,6 +486,7 @@ function setHeure(){const t=document.getElementById('dTime').value||null;persist
 
 function initApp(){
   INAPP=true;
+  var _es=document.getElementById('eSem');if(_es){var _o='';for(var i=1;i<=24;i++){_o+='<option value="'+i+'">Semaine '+i+' (Mois '+Math.ceil(i/4)+')</option>';}_es.innerHTML=_o;}
   document.querySelectorAll('.nav button[data-p]').forEach(b=>b.onclick=()=>navTo(b.dataset.p));
   document.querySelectorAll('#segWeek button').forEach(b=>b.onclick=()=>{SEGR=b.dataset.r;document.querySelectorAll('#segWeek button').forEach(x=>x.classList.toggle('act',x===b));renderWeek();});
   document.querySelectorAll('#segFocus button').forEach(b=>b.onclick=()=>{FOCR=b.dataset.r;document.querySelectorAll('#segFocus button').forEach(x=>x.classList.toggle('act',x===b));renderFocus();});
@@ -576,9 +585,10 @@ function renderFocus(){
   el.innerHTML=rows.length?rows.map(taskHTML).join(''):'<div class="empty">Aucune action cette semaine.</div>';
 }
 function openDetail(id){CUR=ACTIONS.find(a=>a.id===id);var ec=document.getElementById('editCard');if(ec)ec.style.display='none';renderDetail();navTo('detail');}
-async function addTask(){const titre=prompt('Nouvelle action pour '+SEGR+' (semaine '+CURW+') :');if(!titre||!titre.trim())return;const ordre=ACTIONS.filter(a=>a.semaine===CURW&&a.responsable===SEGR).length+1;const row={responsable:SEGR,mois:MONTH(CURW),semaine:CURW,ordre:ordre,titre:titre.trim(),priorite:'P2',duree:'',categorie:'',statut:'a_faire'};if(DEMO){row.id='n'+Math.random();ACTIONS.push(row);renderAll();toast('Action ajoutée');return;}const {data,error}=await supa.from('actions').insert(row).select();if(error){toast('Ajout impossible');return;}if(data&&data[0]){ACTIONS.push(data[0]);notifyAssign(data[0].id);}renderAll();toast('Action ajoutée à '+SEGR);}
-function toggleEdit(){const c=document.getElementById('editCard');const sh=c.style.display==='none';if(sh){document.getElementById('eTitre').value=CUR.titre||'';document.getElementById('eResp').value=CUR.responsable||'Diana';document.getElementById('eDuree').value=CUR.duree||'';document.getElementById('ePrio').value=CUR.priorite||'P2';document.getElementById('eCat').value=CUR.categorie||'';}c.style.display=sh?'block':'none';}
-async function saveEdit(){const newResp=document.getElementById('eResp').value;const changed=newResp!==CUR.responsable;const patch={titre:(document.getElementById('eTitre').value.trim()||CUR.titre),responsable:newResp,duree:document.getElementById('eDuree').value.trim(),priorite:document.getElementById('ePrio').value,categorie:document.getElementById('eCat').value.trim()};await persist(CUR.id,patch);document.getElementById('editCard').style.display='none';renderDetail();if(changed){notifyAssign(CUR.id);toast('Assignée à '+newResp);}else{toast('Action modifiée');}}
+async function addTask(){const titre=prompt('Nouvelle action pour '+SEGR+' (semaine '+CURW+') :');if(!titre||!titre.trim())return;const ordre=ACTIONS.filter(a=>a.semaine===CURW&&a.responsable===SEGR).length+1;const row={responsable:SEGR,mois:MONTH(CURW),semaine:CURW,ordre:ordre,titre:titre.trim(),priorite:'P2',duree:'',categorie:'',statut:'a_faire'};if(DEMO){row.id='n'+Math.random();ACTIONS.push(row);renderAll();openDetail(row.id);openEdit();return;}const {data,error}=await supa.from('actions').insert(row).select();if(error){toast('Ajout impossible');return;}if(data&&data[0]){ACTIONS.push(data[0]);notifyAssign(data[0].id);renderAll();openDetail(data[0].id);openEdit();toast('Précise la semaine, la date et l’heure');return;}renderAll();}
+function openEdit(){const c=document.getElementById('editCard');document.getElementById('eTitre').value=CUR.titre||'';document.getElementById('eResp').value=CUR.responsable||'Diana';document.getElementById('eSem').value=CUR.semaine||1;document.getElementById('eDate').value=CUR.date_prevue||'';document.getElementById('eHeure').value=CUR.heure_prevue||'';document.getElementById('eDuree').value=CUR.duree||'';document.getElementById('ePrio').value=CUR.priorite||'P2';document.getElementById('eCat').value=CUR.categorie||'';c.style.display='block';}
+function toggleEdit(){const c=document.getElementById('editCard');if(c.style.display==='none'){openEdit();}else{c.style.display='none';}}
+async function saveEdit(){const newResp=document.getElementById('eResp').value;const newSem=Number(document.getElementById('eSem').value)||CUR.semaine||1;const changed=newResp!==CUR.responsable;const patch={titre:(document.getElementById('eTitre').value.trim()||CUR.titre),responsable:newResp,semaine:newSem,mois:MONTH(newSem),date_prevue:document.getElementById('eDate').value||null,heure_prevue:document.getElementById('eHeure').value||null,duree:document.getElementById('eDuree').value.trim(),priorite:document.getElementById('ePrio').value,categorie:document.getElementById('eCat').value.trim()};await persist(CUR.id,patch);document.getElementById('editCard').style.display='none';renderDetail();if(changed){notifyAssign(CUR.id);toast('Assignée à '+newResp);}else{toast('Action enregistrée');}}
 async function deleteTask(){if(!confirm('Supprimer définitivement cette action ?'))return;const id=CUR.id;ACTIONS=ACTIONS.filter(a=>a.id!==id);if(!DEMO){const {error}=await supa.from('actions').delete().eq('id',id);if(error){toast('Suppression impossible');}}renderAll();history.back();toast('Action supprimée');}
 function renderApercu(){let rows=APM===0?ACTIONS.slice():ACTIONS.filter(a=>a.mois===APM);if(APS!=='all')rows=rows.filter(a=>a.statut===APS);const done=rows.filter(a=>a.statut==='fait').length;const pct=rows.length?Math.round(done/rows.length*100):0;const sm=document.getElementById('apSummary');if(sm){sm.innerHTML='<div class="hrow"><b style="font-size:14px">'+(APM===0?'Les 6 mois':'Mois '+APM)+'</b><span style="font-weight:800">'+done+' / '+rows.length+' · '+pct+'%</span></div><div class="track" style="margin-top:8px"><i style="width:'+pct+'%"></i></div>';}const byW={};rows.forEach(a=>{(byW[a.semaine]=byW[a.semaine]||[]).push(a);});const weeks=Object.keys(byW).map(Number).sort((a,b)=>a-b);const SP={a_faire:['st-todo','À faire'],en_cours:['st-prog','En cours'],fait:['st-done','Fait']};let h='';weeks.forEach(w=>{h+='<div class="section-title" style="margin-top:14px">Semaine '+w+' · Mois '+MONTH(w)+'</div>';byW[w].sort((a,b)=>a.responsable.localeCompare(b.responsable)||((a.ordre||0)-(b.ordre||0)));h+=byW[w].map(a=>{const sp=SP[a.statut]||SP.a_faire;return '<div class="task" style="padding:10px" onclick="openDetail(\''+a.id+'\')"><div style="flex:1"><p class="tt" style="font-size:12.5px">'+esc(a.titre)+'</p><div class="tmeta"><span class="owner '+RCLS[a.responsable]+'">'+a.responsable+'</span><span class="stat-pill '+sp[0]+'">'+sp[1]+'</span></div></div><span class="chev"><svg class="i" style="width:16px"><use href="#chev"/></svg></span></div>';}).join('');});const el=document.getElementById('apList');if(el)el.innerHTML=h||'<div class="empty">Aucune action.</div>';}
 function renderDetail(){
@@ -586,22 +596,23 @@ function renderDetail(){
   const o=document.getElementById('dOwner');o.textContent=a.responsable;o.className='owner '+RCLS[a.responsable];
   const p=document.getElementById('dPrio');p.textContent=a.priorite||'';p.className='pill '+(a.priorite||'');
   document.getElementById('dTitle').textContent=a.titre;
-  document.getElementById('dMeta').innerHTML='<span><svg class="i"><use href="#calendar"/></svg> Semaine '+a.semaine+'</span><span><svg class="i"><use href="#list"/></svg> '+esc(a.categorie||'')+'</span><span><svg class="i"><use href="#clock"/></svg> '+esc(a.duree||'')+'</span>';
+  document.getElementById('dMeta').innerHTML='<span><svg class="i"><use href="#calendar"/></svg> Semaine '+a.semaine+'</span>'+(a.date_prevue?'<span><svg class="i"><use href="#calendar"/></svg> '+fmtDate(a.date_prevue)+'</span>':'')+(a.heure_prevue?'<span><svg class="i"><use href="#clock"/></svg> '+a.heure_prevue+'</span>':'')+'<span><svg class="i"><use href="#list"/></svg> '+esc(a.categorie||'')+'</span>'+(a.duree?'<span><svg class="i"><use href="#clock"/></svg> '+esc(a.duree)+'</span>':'');
   const subs=(a.sous_etapes||'').split('•').map(s=>s.trim()).filter(Boolean);
   let sh=subs.map(s=>'<li><svg class="i"><use href="#check"/></svg>'+esc(s)+'</li>').join('');
   if(a.dod)sh+='<li style="color:var(--muted)"><svg class="i" style="stroke:var(--muted)"><use href="#flag"/></svg>Fini quand : '+esc(a.dod)+'</li>';
   document.getElementById('dSubs').innerHTML=sh;
   const L=[['a_faire','À faire',''],['en_cours','En cours','prog'],['fait','Fait','done']];
   document.getElementById('dStatus').innerHTML=L.map(x=>'<button class="'+(a.statut===x[0]?'act '+x[2]:'')+'" onclick="setStatut(\''+x[0]+'\')">'+x[1]+'</button>').join('');
-  document.getElementById('dTime').value=a.heure_prevue||'';
   renderRem();
 }
+function fmtDate(d){try{return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});}catch(e){return d;}}
 function renderRem(){
   const a=CUR,el=document.getElementById('dRem');
   if(!a.heure_prevue){el.innerHTML='<p class="sub">Aucune heure définie. Choisis une heure : des rappels seront programmés à 15 min et 5 min avant, puis à l’heure prévue.</p>';return;}
   const t=a.heure_prevue;
   const line=(txt,tm)=>'<div class="reminder" style="margin-bottom:8px"><span class="ric"><svg class="i"><use href="#bell"/></svg></span><div style="flex:1"><b>'+txt+'</b><div class="sub">à '+tm+'</div></div><span class="stat-pill st-done">✓</span></div>';
-  el.innerHTML=line('15 minutes avant',offMin(t,15))+line('5 minutes avant',offMin(t,5))+line('À l’heure prévue',t)
+  const dn=a.date_prevue?'<p class="sub" style="margin:0 0 10px;font-weight:700;color:var(--ink)">Le '+fmtDate(a.date_prevue)+'</p>':'<p class="sub" style="margin:0 0 10px">Chaque jour tant que non fait</p>';
+  el.innerHTML=dn+line('15 minutes avant',offMin(t,15))+line('5 minutes avant',offMin(t,5))+line('À l’heure prévue',t)
     +'<div class="channels"><span class="chan on">Push</span><span class="chan on">In-app</span><span class="chan off">SMS · bientôt</span><span class="chan off">WhatsApp · bientôt</span></div>';
 }
 function renderRevue(){
