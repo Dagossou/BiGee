@@ -429,7 +429,7 @@ async function refreshPush(){
 function minus30(t){const p=t.split(':');let d=Number(p[0])*60+Number(p[1])-30;if(d<0)d+=1440;return String(Math.floor(d/60)).padStart(2,'0')+':'+String(d%60).padStart(2,'0');}
 function offMin(t,n){const p=t.split(':');let d=Number(p[0])*60+Number(p[1])-n;d=((d%1440)+1440)%1440;return String(Math.floor(d/60)).padStart(2,'0')+':'+String(d%60).padStart(2,'0');}
 function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
-function helloWord(){const h=new Date().getHours();return (h>=18||h<5)?'Bonsoir':'Bonjour';}
+function helloWord(){const h=new Date().getHours();return (h>=18||h<6)?'Bonsoir':'Bonjour';}
 
 function saveConfig(){const u=document.getElementById('cfgUrl').value.trim(),k=document.getElementById('cfgKey').value.trim();if(!u||!k){document.getElementById('cfgMsg').innerHTML='<div class="msg err">Renseigne les deux champs.</div>';return;}localStorage.setItem(LS.url,u);localStorage.setItem(LS.key,k);boot();}
 function resetConfig(){localStorage.removeItem(LS.url);localStorage.removeItem(LS.key);location.reload();}
