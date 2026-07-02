@@ -231,6 +231,17 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 .composer{position:fixed;left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom) + 92px);max-width:492px;margin:0 auto;display:flex;gap:8px;padding:8px;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 10px 24px -12px rgba(10,30,20,.35)}
 .chat-send{width:44px;height:44px;border-radius:12px;border:none;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer}
 .chat-send svg{width:20px;height:20px}
+.comp-btn{width:42px;height:42px;border-radius:50%;border:none;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer}
+.comp-btn .ic{font-size:24px}
+.comp-btn.rec{color:#fff;background:var(--coral);animation:recpulse 1s infinite}
+@keyframes recpulse{0%,100%{opacity:1}50%{opacity:.6}}
+.msg-img{max-width:210px;border-radius:12px;display:block}
+.msg-audio{height:40px;max-width:230px;display:block}
+.msg-file{display:flex;align-items:center;gap:8px;color:inherit;text-decoration:none;font-weight:700}
+.msg-file .ic{font-size:22px}
+.proof img{max-width:100%;border-radius:12px;display:block;margin-bottom:8px}
+.proof a{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--green-tx);text-decoration:none}
+.proof .rm{font-size:11px;color:var(--coral-tx);font-weight:700;background:none;border:none;cursor:pointer;padding:6px 0}
 </style>
 </head>
 <body>
@@ -380,6 +391,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
         </div>
         <div class="card"><h3>Statut</h3><div class="chips" id="dStatus"></div></div>
         <div class="card"><h3><svg class="i" style="width:15px;color:var(--green)"><use href="#bell"/></svg> Rappels</h3><div id="dRem" style="margin-top:10px"></div></div>
+        <div class="card"><h3><span class="ic" style="font-size:18px;color:var(--green)">verified</span> Preuve</h3><p class="sub">Photo ou fichier justifiant que la tâche est faite</p><div class="proof" id="dProof"></div><input type="file" id="proofInput" style="display:none" onchange="onProofPicked(event)"><button class="btn ghost" style="margin-top:10px" onclick="pickProof()">Joindre une preuve</button></div>
       </div>
 
       <div class="pane" id="p-revue">
@@ -418,8 +430,11 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
         <div class="section-title">Messages</div>
         <div id="chatList" class="chat-list"></div>
         <div class="composer">
-          <input class="tf" id="chatInput" placeholder="Écris un message…" style="flex:1;margin:0" onkeydown="if(event.key==='Enter')sendMsg()">
-          <button class="chat-send" onclick="sendMsg()"><svg class="i"><use href="#send"/></svg></button>
+          <input type="file" id="fileInput" style="display:none" onchange="onFilePicked(event)">
+          <button class="comp-btn" onclick="pickFile()" title="Joindre"><span class="ic">attach_file</span></button>
+          <input class="tf" id="chatInput" placeholder="Message…" style="flex:1;margin:0" onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="comp-btn" id="micBtn" onclick="toggleRecord()" title="Message vocal"><span class="ic">mic</span></button>
+          <button class="chat-send" onclick="sendMsg()"><span class="ic">send</span></button>
         </div>
       </div>
 
@@ -526,9 +541,39 @@ async function notifyAssign(id){if(DEMO||!supa||!id)return;try{await supa.functi
 function myName(){return (USER&&USER.user_metadata&&USER.user_metadata.prenom)||'Diana';}
 async function loadMsgs(){if(DEMO){MSGS=[];renderChat();return;}const {data,error}=await supa.from('messages').select('*').order('created_at',{ascending:true}).limit(300);if(!error)MSGS=data||[];renderChat();}
 function subscribeMsgs(){if(DEMO||!supa)return;supa.channel('bigee-messages').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},function(p){const m=p.new;if(!MSGS.find(function(x){return x.id===m.id;})){MSGS.push(m);renderChat();const onmsg=document.getElementById('p-messages').classList.contains('on');if(m.auteur!==myName()&&!onmsg)toast('💬 '+m.auteur+' : '+m.texte.slice(0,28));}}).subscribe();}
-function renderChat(){const el=document.getElementById('chatList');if(!el)return;el.innerHTML=MSGS.length?MSGS.map(function(m){const me=m.auteur===myName();const t=m.created_at?new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';return '<div class="bubble '+(me?'me':'them')+'">'+esc(m.texte)+'<div class="meta">'+(me?'':esc(m.auteur)+' · ')+t+'</div></div>';}).join(''):'<div class="empty">Aucun message pour l’instant. Dites-vous bonjour 👋</div>';const p=document.getElementById('p-messages');if(p&&p.classList.contains('on')){const b=document.querySelector('.body');if(b)setTimeout(function(){b.scrollTop=b.scrollHeight;},40);}}
+function renderChat(){const el=document.getElementById('chatList');if(!el)return;el.innerHTML=MSGS.length?MSGS.map(function(m){const me=m.auteur===myName();const t=m.created_at?new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';return '<div class="bubble '+(me?'me':'them')+'">'+msgBody(m)+'<div class="meta">'+(me?'':esc(m.auteur)+' · ')+t+'</div></div>';}).join(''):'<div class="empty">Aucun message pour l’instant. Dites-vous bonjour 👋</div>';const p=document.getElementById('p-messages');if(p&&p.classList.contains('on')){const b=document.querySelector('.body');if(b)setTimeout(function(){b.scrollTop=b.scrollHeight;},40);}}
 async function sendMsg(){const inp=document.getElementById('chatInput');const txt=inp.value.trim();if(!txt)return;inp.value='';const row={auteur:myName(),texte:txt};if(DEMO){row.id='m'+Math.random();row.created_at=new Date().toISOString();MSGS.push(row);renderChat();return;}const {data,error}=await supa.from('messages').insert(row).select();if(error){toast('Envoi impossible');inp.value=txt;return;}if(data&&data[0]&&!MSGS.find(function(x){return x.id===data[0].id;})){MSGS.push(data[0]);renderChat();}notifyMsg(txt);}
 async function notifyMsg(txt){if(DEMO||!supa)return;try{await supa.functions.invoke('notify',{body:{message:txt,from:myName()}});}catch(e){}}
+async function uploadFile(file,fallbackName){
+  if(DEMO){toast('Indispo en mode démo');return null;}
+  var base=(file.name||fallbackName||'fichier').replace(/[^\w.\-]/g,'_');
+  var path=Date.now()+'_'+Math.random().toString(36).slice(2)+'_'+base;
+  var res=await supa.storage.from('media').upload(path,file,{contentType:file.type||undefined,upsert:false});
+  if(res.error){toast('Upload impossible : '+res.error.message);return null;}
+  var pub=supa.storage.from('media').getPublicUrl(path);
+  return {url:pub.data.publicUrl,name:file.name||base};
+}
+function pickFile(){document.getElementById('fileInput').click();}
+async function onFilePicked(e){var f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;toast('Envoi…');var up=await uploadFile(f);if(!up)return;var kind=(f.type||'').indexOf('image/')===0?'image':'file';await sendMediaMsg(kind,up.url,up.name);}
+async function sendMediaMsg(kind,url,fname){var row={auteur:myName(),texte:'',kind:kind,url:url,fname:fname||null};if(DEMO){row.id='m'+Math.random();row.created_at=new Date().toISOString();MSGS.push(row);renderChat();return;}var res=await supa.from('messages').insert(row).select();if(res.error){toast('Envoi impossible : '+res.error.message);return;}if(res.data&&res.data[0]&&!MSGS.find(function(x){return x.id===res.data[0].id;})){MSGS.push(res.data[0]);renderChat();}notifyMsg(kind==='image'?'Photo':(kind==='audio'?'Message vocal':'Fichier'));}
+function msgBody(m){if(m.kind==='image')return '<a href="'+m.url+'" target="_blank"><img class="msg-img" src="'+m.url+'"></a>';if(m.kind==='audio')return '<audio class="msg-audio" controls src="'+m.url+'"></audio>';if(m.kind==='file')return '<a class="msg-file" href="'+m.url+'" target="_blank"><span class="ic">description</span>'+esc(m.fname||'Fichier')+'</a>';return esc(m.texte);}
+var mediaRec=null,recChunks=[];
+async function toggleRecord(){
+  var btn=document.getElementById('micBtn');
+  if(mediaRec&&mediaRec.state==='recording'){mediaRec.stop();return;}
+  if(!navigator.mediaDevices||!window.MediaRecorder){toast('Vocal non supporté ici');return;}
+  try{
+    var stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRec=new MediaRecorder(stream);recChunks=[];
+    mediaRec.ondataavailable=function(ev){if(ev.data&&ev.data.size)recChunks.push(ev.data);};
+    mediaRec.onstop=async function(){stream.getTracks().forEach(function(t){t.stop();});btn.classList.remove('rec');var blob=new Blob(recChunks,{type:'audio/webm'});var file=new File([blob],'vocal.webm',{type:'audio/webm'});toast('Envoi du vocal…');var up=await uploadFile(file,'vocal.webm');if(up)sendMediaMsg('audio',up.url,'vocal.webm');};
+    mediaRec.start();btn.classList.add('rec');toast('Enregistrement… retape pour envoyer');
+  }catch(e){toast('Micro refusé');}
+}
+function pickProof(){document.getElementById('proofInput').click();}
+async function onProofPicked(e){var f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;toast('Envoi de la preuve…');var up=await uploadFile(f);if(!up)return;await persist(CUR.id,{preuve_url:up.url,preuve_name:up.name});renderProof();toast('Preuve ajoutée');}
+async function removeProof(){await persist(CUR.id,{preuve_url:null,preuve_name:null});renderProof();toast('Preuve retirée');}
+function renderProof(){var el=document.getElementById('dProof');if(!el)return;var a=CUR;if(!a||!a.preuve_url){el.innerHTML='<p class="sub">Aucune preuve pour l\'instant.</p>';return;}var isImg=/\.(png|jpe?g|gif|webp|heic|bmp)(\?|$)/i.test(a.preuve_url);el.innerHTML=(isImg?'<a href="'+a.preuve_url+'" target="_blank"><img src="'+a.preuve_url+'"></a>':'<a href="'+a.preuve_url+'" target="_blank"><span class="ic">description</span>'+esc(a.preuve_name||'Fichier')+'</a>')+'<div><button class="rm" onclick="removeProof()">Retirer la preuve</button></div>';}
 function cycle(id){const a=ACTIONS.find(x=>x.id===id);const nx={a_faire:'en_cours',en_cours:'fait',fait:'a_faire'}[a.statut];persist(id,{statut:nx,fait_le:nx==='fait'?new Date().toISOString():null,fait_par:nx==='fait'?((USER&&USER.id)||null):null});}
 function setStatut(s){persist(CUR.id,{statut:s,fait_le:s==='fait'?new Date().toISOString():null});renderDetail();}
 function setHeure(){const t=document.getElementById('dTime').value||null;persist(CUR.id,{heure_prevue:t,rappel_at:null});renderRem();toast(t?'Rappels : 15 min, 5 min avant, et à l’heure':'Heure retirée');}
@@ -642,7 +687,7 @@ function renderDetail(){
   document.getElementById('dSubs').innerHTML=sh;
   const L=[['a_faire','À faire',''],['en_cours','En cours','prog'],['fait','Fait','done']];
   document.getElementById('dStatus').innerHTML=L.map(x=>'<button class="'+(a.statut===x[0]?'act '+x[2]:'')+'" onclick="setStatut(\''+x[0]+'\')">'+x[1]+'</button>').join('');
-  renderRem();
+  renderRem();renderProof();
 }
 function fmtDate(d){try{return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});}catch(e){return d;}}
 function renderRem(){
