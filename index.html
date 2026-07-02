@@ -36,7 +36,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:var(--font)}
 html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--ink);overflow:hidden}
-svg.i{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;display:block}
+svg.i{width:23px;height:23px;fill:currentColor;stroke:none;display:block}
 .app{height:100dvh;max-width:520px;margin:0 auto;display:flex;flex-direction:column;position:relative;background:var(--bg)}
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:26px;z-index:20;background:var(--bg);overflow-y:auto}
 .screen.hide{display:none !important}
@@ -109,7 +109,7 @@ input.tf:focus{outline:none;border-color:var(--green)}
 .feature .tag .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
 .feature h4{margin:11px 0 3px;font-size:17px;font-weight:800}
 .feature .fmeta{font-size:11.5px;opacity:.8;display:flex;gap:14px;margin-top:9px;font-weight:500}
-.feature .fmeta span{display:flex;align-items:center;gap:5px}.feature .fmeta svg{width:14px;height:14px;stroke:var(--green)}
+.feature .fmeta span{display:flex;align-items:center;gap:5px}.feature .fmeta svg{width:14px;height:14px;color:var(--green)}
 .ringF{width:78px;height:78px;border-radius:50%;position:absolute;right:16px;top:50%;transform:translateY(-50%);background:conic-gradient(var(--green) calc(var(--p,0)*1%),rgba(255,255,255,.14) 0);display:flex;align-items:center;justify-content:center}
 .ringF b{width:60px;height:60px;border-radius:50%;background:var(--nuit);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:15px;font-weight:800}
 .ringF b small{font-size:8px;font-weight:600;opacity:.7}
@@ -143,7 +143,7 @@ input.tf:focus{outline:none;border-color:var(--green)}
 .weeknav .wl{font-weight:800;font-size:13.5px}
 .task{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px;margin-bottom:10px;cursor:pointer}
 .chk{width:24px;height:24px;border-radius:8px;border:2px solid var(--line);flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center}
-.chk svg{width:14px;height:14px;stroke-width:3;opacity:0;stroke:var(--green-ink)}
+.chk svg{width:15px;height:15px;opacity:0;fill:var(--green-ink)}
 .task.done .chk{background:var(--green);border-color:var(--green)}.task.done .chk svg{opacity:1}
 .task.prog .chk{border-color:var(--green)}.task.prog .chk::after{content:"";width:8px;height:8px;border-radius:2px;background:var(--green)}
 .task .tt{font-size:13px;font-weight:600;line-height:1.35;margin:0}.task.done .tt{text-decoration:line-through;color:var(--muted)}
@@ -162,7 +162,7 @@ input.tf:focus{outline:none;border-color:var(--green)}
 .dmeta span{display:flex;align-items:center;gap:5px}.dmeta svg{width:13px;height:13px}
 .substeps{margin:12px 0 0;padding:0;list-style:none}
 .substeps li{display:flex;gap:8px;font-size:12px;color:var(--ink);padding:5px 0;font-weight:600}
-.substeps li svg{width:15px;height:15px;stroke:var(--green);flex:none;margin-top:1px}
+.substeps li svg{width:15px;height:15px;color:var(--green);flex:none;margin-top:1px}
 .chips{display:flex;gap:8px;margin-top:12px}
 .chips button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 0;font-size:11.5px;font-weight:800;color:var(--muted);cursor:pointer}
 .chips button.act{background:var(--chip);color:var(--ink)}
@@ -190,7 +190,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 .recap b{font-size:21px;font-weight:800;display:block}.recap span{font-size:10px;color:var(--muted);font-weight:600}
 .field{margin-bottom:12px}
 .field label{font-size:11px;font-weight:800;display:flex;gap:7px;align-items:center;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
-.field label svg{width:15px;height:15px;stroke:var(--green)}
+.field label svg{width:15px;height:15px;color:var(--green)}
 .field textarea{width:100%;border:1px solid var(--line);border-radius:13px;padding:11px;font-size:12.5px;resize:none;background:var(--bg);color:var(--ink)}
 .field textarea:focus{outline:none;border-color:var(--green)}
 .cta{width:100%;border:none;border-radius:15px;padding:14px;font-size:14px;font-weight:800;color:var(--green-ink);background:var(--green);cursor:pointer}
@@ -200,7 +200,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 .obj-card b{font-size:13px;font-weight:800}.obj-card .ech{font-size:10.5px;color:var(--muted);font-weight:600}
 .obj-card .opct{margin-left:auto;font-size:17px;font-weight:800}
 .obj-card .ind{font-size:10.5px;color:var(--muted);margin-top:8px;font-weight:600;display:flex;gap:12px;flex-wrap:wrap}
-.obj-card .ind span{display:flex;align-items:center;gap:4px}.obj-card .ind svg{width:12px;height:12px;stroke:var(--green)}
+.obj-card .ind span{display:flex;align-items:center;gap:4px}.obj-card .ind svg{width:12px;height:12px;color:var(--green)}
 .habit{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px;margin-bottom:10px}
 .habit .hic{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none}
 .habit b{font-size:12.5px;font-weight:800;display:block}.habit span{font-size:10.5px;color:var(--muted);font-weight:600}
@@ -227,33 +227,33 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<symbol id="bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 19a2 2 0 0 0 4 0"/></symbol>
-<symbol id="edit" viewBox="0 0 24 24"><path d="M4 20h4L18.5 9.5l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></symbol>
-<symbol id="home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></symbol>
-<symbol id="list" viewBox="0 0 24 24"><path d="M4 7l1.6 1.6L8 6"/><path d="M4 13l1.6 1.6L8 12"/><path d="M11 7h9M11 13h9M11 18h6"/></symbol>
-<symbol id="bolt" viewBox="0 0 24 24"><path d="M13 3L5 13h6l-1 8 8-11h-6l1-7z"/></symbol>
-<symbol id="calendar" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M4 9.5h16M8 3v4M16 3v4"/></symbol>
-<symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6"/></symbol>
-<symbol id="trend" viewBox="0 0 24 24"><path d="M4 15l5-5 4 4 7-8"/><path d="M17 6h4v4"/></symbol>
-<symbol id="users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><path d="M16 6a3 3 0 0 1 0 6M22 20c0-2.5-2-4.2-4-4.6"/></symbol>
-<symbol id="arrow-ur" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></symbol>
-<symbol id="check" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></symbol>
-<symbol id="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
-<symbol id="back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
-<symbol id="chevrons" viewBox="0 0 24 24"><path d="M5 6l5 6-5 6"/><path d="M12 6l5 6-5 6"/></symbol>
-<symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></symbol>
-<symbol id="logout" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 12H3M6 8l-3 4 3 4"/></symbol>
-<symbol id="flag" viewBox="0 0 24 24"><path d="M6 21V4h11l-2 4 2 4H6"/></symbol>
-<symbol id="left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
-<symbol id="right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
-<symbol id="play" viewBox="0 0 24 24"><path d="M7 5l11 7-11 7z"/></symbol>
-<symbol id="refresh" viewBox="0 0 24 24"><path d="M5 12a7 7 0 0 1 12-5l2 2M19 12a7 7 0 0 1-12 5l-2-2"/><path d="M19 4v5h-5M5 20v-5h5"/></symbol>
-<symbol id="repeat" viewBox="0 0 24 24"><path d="M4 9a5 5 0 0 1 5-5h9l-3-3M20 15a5 5 0 0 1-5 5H6l3 3"/></symbol>
-<symbol id="briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/></symbol>
-<symbol id="grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
-<symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-<symbol id="chat" viewBox="0 0 24 24"><path d="M21 11.5a7.5 7.5 0 0 1-10.9 6.7L4 20l1.8-5.1A7.5 7.5 0 1 1 21 11.5z"/></symbol>
-<symbol id="send" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><path d="M12 2.2a1.1 1.1 0 0 1 1.1 1.1v.6a6.2 6.2 0 0 1 5 6.1c0 3.3.9 4.7 1.7 5.6.7.8.2 1.9-.8 1.9H5.3c-1 0-1.5-1.1-.8-1.9.8-.9 1.7-2.3 1.7-5.6a6.2 6.2 0 0 1 5-6.1v-.6A1.1 1.1 0 0 1 12 2.2z"/><path d="M9.4 19.4a2.6 2.6 0 0 0 5.2 0z"/></symbol>
+<symbol id="edit" viewBox="0 0 24 24"><path d="M16.8 3.1a2.1 2.1 0 0 1 3 0l1.1 1.1a2.1 2.1 0 0 1 0 3l-1.3 1.3-4.1-4.1 1.3-1.3z"/><path d="M14.1 5.9 3.6 16.4a1 1 0 0 0-.3.6l-.3 3a.8.8 0 0 0 .9.9l3-.3a1 1 0 0 0 .6-.3L18 9.9 14.1 5.9z"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path d="M11.3 3.2a1 1 0 0 1 1.4 0l8.1 7.3a1 1 0 0 1-.7 1.8H19v6.9a1 1 0 0 1-1 1h-3.4v-5.4H9.4V20H6a1 1 0 0 1-1-1v-6.9H3.9a1 1 0 0 1-.7-1.8l8.1-7.3z"/></symbol>
+<symbol id="list" viewBox="0 0 24 24"><rect x="4" y="5.4" width="16" height="3" rx="1.5"/><rect x="4" y="10.5" width="16" height="3" rx="1.5"/><rect x="4" y="15.6" width="11" height="3" rx="1.5"/></symbol>
+<symbol id="bolt" viewBox="0 0 24 24"><path d="M13.8 2.2c.6-.7 1.7-.1 1.4.8L13.7 9h4.2c.9 0 1.3 1 .7 1.7l-9 10c-.6.7-1.6.1-1.4-.8L9.6 13H5.4c-.9 0-1.3-1-.7-1.7l9.1-9.1z"/></symbol>
+<symbol id="calendar" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M7.5 2.2a1 1 0 0 1 1 1V4h7v-.8a1 1 0 1 1 2 0V4H19a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h.5v-.8a1 1 0 0 1 1-1zM4 9.5V18a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9.5H4z"/></symbol>
+<symbol id="target" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19zm0 3.2a6.3 6.3 0 1 1 0 12.6 6.3 6.3 0 0 1 0-12.6z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="trend" viewBox="0 0 24 24"><path d="M4.4 15.1a1.4 1.4 0 0 0 2 2l3.6-3.6 2.5 2.5c.5.5 1.4.5 1.9 0l4.2-4.2V14a1.4 1.4 0 1 0 2.8 0V7.4a1 1 0 0 0-1-1H14a1.4 1.4 0 0 0 0 2.8h2.2l-3.3 3.3-2.5-2.5a1.4 1.4 0 0 0-1.9 0l-4.6 4.6z"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.3"/><path d="M2.8 19.2c0-3.4 2.8-5.7 6.2-5.7s6.2 2.3 6.2 5.7v.6a.8.8 0 0 1-.8.8H3.6a.8.8 0 0 1-.8-.8v-.6z"/><circle cx="17.2" cy="8.6" r="2.7"/><path d="M16.4 13.6c2.7.3 4.9 2.4 4.9 5.5v.5a.8.8 0 0 1-.8.8h-2.9v-1.2c0-2-.6-3.8-1.7-5.2l.5-.4z"/></symbol>
+<symbol id="arrow-ur" viewBox="0 0 24 24"><path d="M8.5 5a1.4 1.4 0 0 0 0 2.8h4.3l-6.4 6.4a1.4 1.4 0 1 0 2 2l6.4-6.4v4.3a1.4 1.4 0 0 0 2.8 0V6.4a1.4 1.4 0 0 0-1.4-1.4H8.5z"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path d="M9.6 15.6 5.7 11.7a1.4 1.4 0 0 0-2 2l4.9 4.9c.5.5 1.4.5 1.9 0L20.3 8.8a1.4 1.4 0 0 0-2-2L9.6 15.6z"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path d="M9.4 5.4a1.3 1.3 0 0 0 0 1.9l4.7 4.7-4.7 4.7a1.3 1.3 0 0 0 1.9 1.9l5.6-5.6a1.3 1.3 0 0 0 0-1.9L11.3 5.4a1.3 1.3 0 0 0-1.9 0z"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="M14.6 5.4a1.3 1.3 0 0 1 0 1.9L9.9 12l4.7 4.7a1.3 1.3 0 0 1-1.9 1.9l-5.6-5.6a1.3 1.3 0 0 1 0-1.9l5.6-5.6a1.3 1.3 0 0 1 1.9 0z"/></symbol>
+<symbol id="chevrons" viewBox="0 0 24 24"><path d="M5.5 5.6a1.2 1.2 0 0 0 0 1.7L10.2 12l-4.7 4.7a1.2 1.2 0 0 0 1.7 1.7l5.5-5.5a1.2 1.2 0 0 0 0-1.7L7.2 5.6a1.2 1.2 0 0 0-1.7 0z"/><path d="M12 5.6a1.2 1.2 0 0 0 0 1.7L16.7 12 12 16.7a1.2 1.2 0 0 0 1.7 1.7l5.5-5.5a1.2 1.2 0 0 0 0-1.7L13.7 5.6a1.2 1.2 0 0 0-1.7 0z"/></symbol>
+<symbol id="clock" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2.4a9.6 9.6 0 1 0 0 19.2 9.6 9.6 0 0 0 0-19.2zM13 7a1 1 0 1 0-2 0v5.2c0 .3.2.6.4.8l3.4 2.4a1 1 0 0 0 1.2-1.6L13 11.7V7z"/></symbol>
+<symbol id="logout" viewBox="0 0 24 24"><path d="M5 3h7a2 2 0 0 1 2 2v2.5a1 1 0 1 1-2 0V5H5v14h7v-2.5a1 1 0 1 1 2 0V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17.3 8.2a1 1 0 0 0-1.4 1.4l1.3 1.4H10a1 1 0 1 0 0 2h7.2l-1.3 1.4a1 1 0 0 0 1.4 1.4l3-3a1 1 0 0 0 0-1.4l-3-3z"/></symbol>
+<symbol id="flag" viewBox="0 0 24 24"><path d="M6 2.3A1.2 1.2 0 0 0 4.8 3.5V21a1.2 1.2 0 0 0 2.4 0v-6.1l10.7-1.5a1 1 0 0 0 .7-1.6L16.6 8l2-3.8a1 1 0 0 0-1-1.5L7.2 4.3v-.8A1.2 1.2 0 0 0 6 2.3z"/></symbol>
+<symbol id="left" viewBox="0 0 24 24"><path d="M14.6 5.4a1.3 1.3 0 0 1 0 1.9L9.9 12l4.7 4.7a1.3 1.3 0 0 1-1.9 1.9l-5.6-5.6a1.3 1.3 0 0 1 0-1.9l5.6-5.6a1.3 1.3 0 0 1 1.9 0z"/></symbol>
+<symbol id="right" viewBox="0 0 24 24"><path d="M9.4 5.4a1.3 1.3 0 0 0 0 1.9l4.7 4.7-4.7 4.7a1.3 1.3 0 0 0 1.9 1.9l5.6-5.6a1.3 1.3 0 0 0 0-1.9L11.3 5.4a1.3 1.3 0 0 0-1.9 0z"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path d="M7 4.6c0-.8.9-1.3 1.6-.9l11.2 6.9c.7.4.7 1.4 0 1.8L8.6 19.3c-.7.4-1.6-.1-1.6-.9V4.6z"/></symbol>
+<symbol id="refresh" viewBox="0 0 24 24"><path d="M12 4.5a7.5 7.5 0 0 1 6.9 4.6 1 1 0 0 1-1.8.8A5.5 5.5 0 0 0 6.9 9.5H9a1 1 0 0 1 0 2H4.3a1 1 0 0 1-1-1V5.8a1 1 0 0 1 2 0v1.5A7.5 7.5 0 0 1 12 4.5z"/><path d="M12 19.5a7.5 7.5 0 0 1-6.9-4.6 1 1 0 0 1 1.8-.8 5.5 5.5 0 0 0 10.2-.4H15a1 1 0 0 1 0-2h4.7a1 1 0 0 1 1 1v4.7a1 1 0 0 1-2 0v-1.5A7.5 7.5 0 0 1 12 19.5z"/></symbol>
+<symbol id="repeat" viewBox="0 0 24 24"><path d="M12 4.5a7.5 7.5 0 0 1 6.9 4.6 1 1 0 0 1-1.8.8A5.5 5.5 0 0 0 6.9 9.5H9a1 1 0 0 1 0 2H4.3a1 1 0 0 1-1-1V5.8a1 1 0 0 1 2 0v1.5A7.5 7.5 0 0 1 12 4.5z"/><path d="M12 19.5a7.5 7.5 0 0 1-6.9-4.6 1 1 0 0 1 1.8-.8 5.5 5.5 0 0 0 10.2-.4H15a1 1 0 0 1 0-2h4.7a1 1 0 0 1 1 1v4.7a1 1 0 0 1-2 0v-1.5A7.5 7.5 0 0 1 12 19.5z"/></symbol>
+<symbol id="briefcase" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="4" rx="1.6"/><rect x="3" y="6.5" width="18" height="13.5" rx="3"/></symbol>
+<symbol id="grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="2.2"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="2.2"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="2.2"/><rect x="13" y="13" width="7.5" height="7.5" rx="2.2"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M10.4 4a1.6 1.6 0 0 1 3.2 0v6.4H20a1.6 1.6 0 0 1 0 3.2h-6.4V20a1.6 1.6 0 0 1-3.2 0v-6.4H4a1.6 1.6 0 0 1 0-3.2h6.4V4z"/></symbol>
+<symbol id="chat" viewBox="0 0 24 24"><rect x="2.5" y="3.5" width="19" height="13" rx="4"/><path d="M8 15.5l-1 4.2c-.1.5.4.9.9.6l4.6-3.2z"/></symbol>
+<symbol id="send" viewBox="0 0 24 24"><path d="M21.4 2.6a1 1 0 0 0-1-.3L3.7 8.6c-1 .3-.9 1.7.1 1.9l6.7 1.6 1.6 6.7c.2 1 1.6 1.1 1.9.1L21.7 3.6a1 1 0 0 0-.3-1z"/></symbol>
 </defs></svg>
 
 <div class="app">
@@ -371,11 +371,11 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
           <button class="cta" id="editSaveBtn" style="margin-top:12px" onclick="saveEdit()">Enregistrer</button>
         </div>
         <div class="card"><h3>Statut</h3><div class="chips" id="dStatus"></div></div>
-        <div class="card"><h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#bell"/></svg> Rappels</h3><div id="dRem" style="margin-top:10px"></div></div>
+        <div class="card"><h3><svg class="i" style="width:15px;color:var(--green)"><use href="#bell"/></svg> Rappels</h3><div id="dRem" style="margin-top:10px"></div></div>
       </div>
 
       <div class="pane" id="p-revue">
-        <div class="card feature" style="padding:15px"><h3 style="color:var(--papier)"><svg class="i" style="width:15px;stroke:var(--green)"><use href="#calendar"/></svg> Revue de fin de semaine</h3><p class="sub" style="color:rgba(244,247,246,.8)">Cinq minutes à deux, ça vaut le coup.</p></div>
+        <div class="card feature" style="padding:15px"><h3 style="color:var(--papier)"><svg class="i" style="width:15px;color:var(--green)"><use href="#calendar"/></svg> Revue de fin de semaine</h3><p class="sub" style="color:rgba(244,247,246,.8)">Cinq minutes à deux, ça vaut le coup.</p></div>
         <div class="recap"><div><b id="rDone" style="color:var(--green-tx)">0</b><span>Faites</span></div><div><b id="rProg" style="color:var(--couple-tx)">0</b><span>En cours</span></div><div><b id="rTodo" style="color:var(--coral-tx)">0</b><span>À faire</span></div></div>
         <div class="field"><label><svg class="i"><use href="#check"/></svg> Ce qui a marché</label><textarea rows="2" placeholder="Nos réussites de la semaine..."></textarea></div>
         <div class="field"><label><svg class="i"><use href="#bolt"/></svg> Ce qui a bloqué</label><textarea rows="2" placeholder="Obstacles rencontrés..."></textarea></div>
@@ -625,7 +625,7 @@ function renderDetail(){
   document.getElementById('dMeta').innerHTML='<span><svg class="i"><use href="#calendar"/></svg> Semaine '+a.semaine+'</span>'+(a.date_prevue?'<span><svg class="i"><use href="#calendar"/></svg> '+fmtDate(a.date_prevue)+'</span>':'')+(a.heure_prevue?'<span><svg class="i"><use href="#clock"/></svg> '+a.heure_prevue+'</span>':'')+'<span><svg class="i"><use href="#list"/></svg> '+esc(a.categorie||'')+'</span>'+(a.duree?'<span><svg class="i"><use href="#clock"/></svg> '+esc(a.duree)+'</span>':'');
   const subs=(a.sous_etapes||'').split('•').map(s=>s.trim()).filter(Boolean);
   let sh=subs.map(s=>'<li><svg class="i"><use href="#check"/></svg>'+esc(s)+'</li>').join('');
-  if(a.dod)sh+='<li style="color:var(--muted)"><svg class="i" style="stroke:var(--muted)"><use href="#flag"/></svg>Fini quand : '+esc(a.dod)+'</li>';
+  if(a.dod)sh+='<li style="color:var(--muted)"><svg class="i" style="color:var(--muted)"><use href="#flag"/></svg>Fini quand : '+esc(a.dod)+'</li>';
   document.getElementById('dSubs').innerHTML=sh;
   const L=[['a_faire','À faire',''],['en_cours','En cours','prog'],['fait','Fait','done']];
   document.getElementById('dStatus').innerHTML=L.map(x=>'<button class="'+(a.statut===x[0]?'act '+x[2]:'')+'" onclick="setStatut(\''+x[0]+'\')">'+x[1]+'</button>').join('');
