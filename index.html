@@ -270,6 +270,15 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 .notif .ntitle{font-weight:800;font-size:13px;display:flex;justify-content:space-between;gap:8px}
 .notif .ntime{font-size:10px;color:var(--muted);font-weight:600;flex:none}
 .notif .ntext{font-size:12.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px}
+.modal.hide{display:none}
+.pop{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 24px 60px -18px rgba(6,24,14,.55);animation:popin .22s cubic-bezier(.2,.8,.3,1);max-height:82vh;display:flex;flex-direction:column}
+@keyframes popin{from{opacity:0;transform:translateY(12px) scale(.95)}to{opacity:1;transform:none}}
+.pop-close{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:none;color:var(--muted);font-weight:800;font-size:14px;padding:12px;cursor:pointer}
+.tick{display:inline-flex;vertical-align:middle;margin-left:2px}
+.tick .ic{font-size:15px;font-variation-settings:'FILL' 1,'wght' 600}
+.tick.read{color:#38bdf8}
+.apl-dur{font-size:9.5px;opacity:.65;margin-left:2px}
 .msg-file{display:flex;align-items:center;gap:8px;color:inherit;text-decoration:none;font-weight:700}
 .msg-file .ic{font-size:22px}
 .proof img{max-width:100%;border-radius:12px;display:block;margin-bottom:8px}
@@ -523,12 +532,12 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
     </div>
   </div>
 
-  <div class="sheet hide" id="notifSheet" onclick="closeNotif(event)">
-    <div class="sheet-card">
+  <div class="modal hide" id="notifSheet" onclick="closeNotif(event)">
+    <div class="pop">
       <div class="ovl-head"><b id="notifTitle">Notifications</b><button class="lnk" onclick="markAllNotifs()"><span class="ic" style="font-size:18px">done_all</span>Tout lire</button></div>
       <div id="notifList" class="notif-list"></div>
       <button class="btn ghost" style="margin:12px 0 0" onclick="enableNotifications()"><span class="ic">notifications_active</span> Activer les rappels push</button>
-      <button class="cancel" onclick="closeNotif()">Fermer</button>
+      <button class="pop-close" onclick="closeNotif()">Fermer</button>
     </div>
   </div>
 
@@ -665,7 +674,7 @@ function subscribeMsgs(){if(DEMO||!supa)return;supa.channel('bigee-messages').on
   if(p.eventType==='INSERT'){var m=p.new;if(!MSGS.find(function(x){return x.id===m.id;})){MSGS.push(m);renderChat();var onmsg=document.getElementById('p-messages').classList.contains('on');if(m.auteur!==myName()){var prev=m.texte||(m.kind==='image'?'📷 Photo':m.kind==='audio'?'🎤 Message vocal':m.kind==='file'?'📎 Fichier':'Message');pushNotif('message',m.auteur,prev);if(onmsg)markRead();else toast('💬 '+m.auteur+' : '+prev.slice(0,28));}renderBadges();}}
   else{loadMsgs();renderBadges();}
 }).subscribe();}
-function renderChat(){var el=document.getElementById('chatList');if(!el)return;el.innerHTML=MSGS.length?MSGS.map(function(m){var me=m.auteur===myName();var t=m.created_at?new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var quote=m.reply_txt?'<div class="quote"><b>'+esc(m.reply_auteur||'')+'</b>'+esc((m.reply_txt||'').slice(0,90))+'</div>':'';var meta=(me?'':esc(m.auteur)+' · ')+t+(m.edited?' · modifié':'')+(me?(m.lu?' · Lu':' · Envoyé'):'');return '<div class="bubble '+(me?'me':'them')+'" data-id="'+m.id+'">'+quote+msgBody(m)+'<div class="meta">'+meta+'</div></div>';}).join(''):'<div class="empty">Aucun message pour l’instant. Dites-vous bonjour 👋</div>';var p=document.getElementById('p-messages');if(p&&p.classList.contains('on')){var b=document.querySelector('.body');if(b)setTimeout(function(){b.scrollTop=b.scrollHeight;},40);}}
+function renderChat(){var el=document.getElementById('chatList');if(!el)return;el.innerHTML=MSGS.length?MSGS.map(function(m){var me=m.auteur===myName();var t=m.created_at?new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var quote=m.reply_txt?'<div class="quote"><b>'+esc(m.reply_auteur||'')+'</b>'+esc((m.reply_txt||'').slice(0,90))+'</div>':'';var ticks=me?' <span class="tick'+(m.lu?' read':'')+'"><span class="ic">'+(m.lu?'done_all':'done')+'</span></span>':'';var meta=(me?'':esc(m.auteur)+' · ')+t+(m.edited?' · modifié':'')+ticks;return '<div class="bubble '+(me?'me':'them')+'" data-id="'+m.id+'">'+quote+msgBody(m)+'<div class="meta">'+meta+'</div></div>';}).join(''):'<div class="empty">Aucun message pour l’instant. Dites-vous bonjour 👋</div>';var p=document.getElementById('p-messages');if(p&&p.classList.contains('on')){var b=document.querySelector('.body');if(b)setTimeout(function(){b.scrollTop=b.scrollHeight;},40);}}
 var REPLYTO=null;
 function replyGo(){var m=MSGS.find(function(x){return x.id===CURMSG;});document.getElementById('msgSheet').classList.add('hide');if(!m)return;var txt=m.texte||(m.kind==='image'?'Photo':m.kind==='audio'?'Message vocal':m.kind==='file'?'Fichier':'');REPLYTO={txt:txt,auteur:m.auteur};document.getElementById('replyTxt').innerHTML='<b>'+esc(REPLYTO.auteur)+'</b> '+esc(txt.slice(0,60));document.getElementById('replyBar').classList.remove('hide');var ci=document.getElementById('chatInput');if(ci)ci.focus();}
 function cancelReply(){REPLYTO=null;var rb=document.getElementById('replyBar');if(rb)rb.classList.add('hide');}
@@ -697,7 +706,8 @@ async function sendMediaMsg(kind,url,fname){var row={auteur:myName(),texte:'',ki
 function msgBody(m){if(m.kind==='image')return '<a href="'+m.url+'" target="_blank" onclick="event.stopPropagation()"><img class="msg-img" src="'+m.url+'"></a>';if(m.kind==='audio')return audioHTML(m);if(m.kind==='file')return '<a class="msg-file" href="'+m.url+'" target="_blank" onclick="event.stopPropagation()"><span class="ic">description</span>'+esc(m.fname||'Fichier')+'</a>';return esc(m.texte);}
 function hashStr(s){var h=5381;s=s||'';for(var i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))>>>0;}return h;}
 function waveBars(seed){var s=seed||1,h='';for(var i=0;i<32;i++){s=(s*1103515245+12345)>>>0;var v=22+(s%78);h+='<i style="height:'+v+'%"></i>';}return h;}
-function audioHTML(m){var seed=hashStr(m.url||('a'+m.id));return '<div class="apl" onclick="event.stopPropagation()"><button class="apl-btn" onclick="aplToggle(this)"><span class="ic">play_arrow</span></button><div class="apl-wave" onclick="aplSeek(event,this)">'+waveBars(seed)+'</div><span class="apl-time">0:00</span><audio preload="metadata" src="'+m.url+'"></audio></div>';}
+function audioHTML(m){var seed=hashStr(m.url||('a'+m.id));return '<div class="apl" onclick="event.stopPropagation()"><button class="apl-btn" onclick="aplToggle(this)"><span class="ic">play_arrow</span></button><div class="apl-wave" onclick="aplSeek(event,this)">'+waveBars(seed)+'</div><span class="apl-time">0:00</span><audio preload="metadata" src="'+m.url+'" onloadedmetadata="aplMeta(this)"></audio></div>';}
+function aplMeta(au){var apl=au.closest('.apl');if(!apl)return;var t=apl.querySelector('.apl-time');if(!t)return;if(isFinite(au.duration)&&au.duration>0){if(au.paused)t.textContent=fmtDur(au.duration);return;}if(au._durFix)return;au._durFix=true;var ondur=function(){if(isFinite(au.duration)&&au.duration>0){au.removeEventListener('timeupdate',ondur);try{au.currentTime=0;}catch(e){}if(au.paused)t.textContent=fmtDur(au.duration);}};au.addEventListener('timeupdate',ondur);try{au.currentTime=1e101;}catch(e){}}
 function fmtDur(s){s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
 function aplSetProg(apl,p){var bars=apl.querySelectorAll('.apl-wave i');var upto=Math.round(p*bars.length);for(var i=0;i<bars.length;i++){if(i<upto)bars[i].classList.add('on');else bars[i].classList.remove('on');}}
 function aplProg(apl,au){var p=au.duration&&isFinite(au.duration)?au.currentTime/au.duration:0;aplSetProg(apl,p);var t=apl.querySelector('.apl-time');if(t)t.textContent=fmtDur(au.currentTime);}
