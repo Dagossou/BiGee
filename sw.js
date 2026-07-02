@@ -1,5 +1,5 @@
-// BiGee — service worker (installation + démarrage hors-ligne)
-const CACHE = 'bigee-v1';
+// BiGee — service worker v3 (mise à jour immédiate + hors-ligne + notifications)
+const CACHE = 'bigee-v3';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -17,20 +17,39 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  // Toujours réseau d'abord pour Supabase (données à jour) ; cache pour le reste.
-  if (url.hostname.endsWith('supabase.co')) return;
+
+  // Données Supabase : toujours le réseau, jamais le cache
+  if (url.hostname.endsWith('supabase.co') || url.hostname.endsWith('supabase.in')) return;
+
+  // Ouverture de l'app : RESEAU d'abord (on voit tout de suite les mises à jour),
+  // et repli sur le cache seulement si hors-ligne.
+  if (req.mode === 'navigate') {
+    e.respondWith((async () => {
+      const cache = await caches.open(CACHE);
+      try {
+        const r = await fetch(req);
+        cache.put('./index.html', r.clone());
+        return r;
+      } catch (_) {
+        return (await cache.match('./index.html')) || (await cache.match('./')) || Response.error();
+      }
+    })());
+    return;
+  }
+
+  // Autres ressources : cache d'abord, sinon réseau (et on met en cache)
   e.respondWith(
-    fetch(req).then((res) => {
-      const copy = res.clone();
-      caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
-      return res;
-    }).catch(() => caches.match(req).then((r) => r || caches.match('./index.html')))
+    caches.match(req).then((c) => c || fetch(req).then((r) => {
+      const cp = r.clone();
+      caches.open(CACHE).then((x) => x.put(req, cp)).catch(() => {});
+      return r;
+    }).catch(() => c))
   );
 });
 
-// Rappels : affiche la notification poussée par le serveur (Supabase/cron)
+// Notifications poussées par le serveur (rappels)
 self.addEventListener('push', (e) => {
-  let data = { title: 'BiGee', body: 'Rappel : une action arrive bientôt.' };
+  let data = { title: 'BiGee', body: 'Rappel' };
   try { if (e.data) data = e.data.json(); } catch (_) {}
   e.waitUntil(self.registration.showNotification(data.title || 'BiGee', {
     body: data.body || '', icon: 'icon-192.png', badge: 'icon-192.png'
