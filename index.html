@@ -242,6 +242,13 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 .proof img{max-width:100%;border-radius:12px;display:block;margin-bottom:8px}
 .proof a{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--green-tx);text-decoration:none}
 .proof .rm{font-size:11px;color:var(--coral-tx);font-weight:700;background:none;border:none;cursor:pointer;padding:6px 0}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:80;padding:16px}
+.sheet.hide{display:none}
+.sheet-card{width:100%;max-width:420px}
+.sheet-card button{width:100%;border:1px solid var(--line);background:var(--card);padding:16px;font-size:15px;font-weight:700;color:var(--ink);cursor:pointer;display:block}
+.sheet-card button:first-child{border-radius:16px 16px 0 0}
+.sheet-card button.danger{color:var(--coral-tx);border-radius:0 0 16px 16px}
+.sheet-card button.cancel{color:var(--muted);border-radius:16px;margin-top:8px}
 </style>
 </head>
 <body>
@@ -448,6 +455,14 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
     </div>
   </div>
 
+  <div class="sheet hide" id="msgSheet" onclick="closeSheet(event)">
+    <div class="sheet-card">
+      <button id="msgEditBtn" onclick="editMsgGo()">Modifier</button>
+      <button class="danger" onclick="delMsgGo()">Supprimer</button>
+      <button class="cancel" onclick="closeSheet()">Annuler</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 </div>
 
@@ -540,10 +555,18 @@ async function persist(id,patch){const a=ACTIONS.find(x=>x.id===id);if(a)Object.
 async function notifyAssign(id){if(DEMO||!supa||!id)return;try{await supa.functions.invoke('notify',{body:{action_id:id}});}catch(e){}}
 function myName(){return (USER&&USER.user_metadata&&USER.user_metadata.prenom)||'Diana';}
 async function loadMsgs(){if(DEMO){MSGS=[];renderChat();return;}const {data,error}=await supa.from('messages').select('*').order('created_at',{ascending:true}).limit(300);if(!error)MSGS=data||[];renderChat();}
-function subscribeMsgs(){if(DEMO||!supa)return;supa.channel('bigee-messages').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},function(p){const m=p.new;if(!MSGS.find(function(x){return x.id===m.id;})){MSGS.push(m);renderChat();const onmsg=document.getElementById('p-messages').classList.contains('on');if(m.auteur!==myName()&&!onmsg)toast('💬 '+m.auteur+' : '+m.texte.slice(0,28));}}).subscribe();}
-function renderChat(){const el=document.getElementById('chatList');if(!el)return;el.innerHTML=MSGS.length?MSGS.map(function(m){const me=m.auteur===myName();const t=m.created_at?new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';return '<div class="bubble '+(me?'me':'them')+'">'+msgBody(m)+'<div class="meta">'+(me?'':esc(m.auteur)+' · ')+t+'</div></div>';}).join(''):'<div class="empty">Aucun message pour l’instant. Dites-vous bonjour 👋</div>';const p=document.getElementById('p-messages');if(p&&p.classList.contains('on')){const b=document.querySelector('.body');if(b)setTimeout(function(){b.scrollTop=b.scrollHeight;},40);}}
+function subscribeMsgs(){if(DEMO||!supa)return;supa.channel('bigee-messages').on('postgres_changes',{event:'*',schema:'public',table:'messages'},function(p){
+  if(p.eventType==='INSERT'){var m=p.new;if(!MSGS.find(function(x){return x.id===m.id;})){MSGS.push(m);renderChat();var onmsg=document.getElementById('p-messages').classList.contains('on');if(m.auteur!==myName()&&!onmsg)toast('💬 '+m.auteur+' : '+((m.texte||'pièce jointe')).slice(0,28));}}
+  else{loadMsgs();}
+}).subscribe();}
+function renderChat(){const el=document.getElementById('chatList');if(!el)return;el.innerHTML=MSGS.length?MSGS.map(function(m){const me=m.auteur===myName();const t=m.created_at?new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';return '<div class="bubble '+(me?'me':'them')+'"'+(me?' onclick="openMsgSheet(\''+m.id+'\')"':'')+'>'+msgBody(m)+'<div class="meta">'+(me?'':esc(m.auteur)+' · ')+t+(m.edited?' · modifié':'')+'</div></div>';}).join(''):'<div class="empty">Aucun message pour l’instant. Dites-vous bonjour 👋</div>';const p=document.getElementById('p-messages');if(p&&p.classList.contains('on')){const b=document.querySelector('.body');if(b)setTimeout(function(){b.scrollTop=b.scrollHeight;},40);}}
 async function sendMsg(){const inp=document.getElementById('chatInput');const txt=inp.value.trim();if(!txt)return;inp.value='';const row={auteur:myName(),texte:txt};if(DEMO){row.id='m'+Math.random();row.created_at=new Date().toISOString();MSGS.push(row);renderChat();return;}const {data,error}=await supa.from('messages').insert(row).select();if(error){toast('Envoi impossible');inp.value=txt;return;}if(data&&data[0]&&!MSGS.find(function(x){return x.id===data[0].id;})){MSGS.push(data[0]);renderChat();}notifyMsg(txt);}
 async function notifyMsg(txt){if(DEMO||!supa)return;try{await supa.functions.invoke('notify',{body:{message:txt,from:myName()}});}catch(e){}}
+var CURMSG=null;
+function openMsgSheet(id){CURMSG=id;var m=MSGS.find(function(x){return x.id===id;});if(!m)return;document.getElementById('msgEditBtn').style.display=(!m.kind||m.kind==='text')?'block':'none';document.getElementById('msgSheet').classList.remove('hide');}
+function closeSheet(e){if(e&&e.target&&e.target.id!=='msgSheet')return;document.getElementById('msgSheet').classList.add('hide');}
+async function editMsgGo(){var m=MSGS.find(function(x){return x.id===CURMSG;});document.getElementById('msgSheet').classList.add('hide');if(!m)return;var t=prompt('Modifier le message :',m.texte||'');if(t==null)return;t=t.trim();if(!t)return;m.texte=t;renderChat();if(!DEMO){var r=await supa.from('messages').update({texte:t}).eq('id',m.id);if(r.error)toast('Modification impossible');}}
+async function delMsgGo(){var id=CURMSG;document.getElementById('msgSheet').classList.add('hide');if(!confirm('Supprimer ce message ?'))return;MSGS=MSGS.filter(function(x){return x.id!==id;});renderChat();if(!DEMO){var r=await supa.from('messages').delete().eq('id',id);if(r.error)toast('Suppression impossible');}}
 async function uploadFile(file,fallbackName){
   if(DEMO){toast('Indispo en mode démo');return null;}
   var base=(file.name||fallbackName||'fichier').replace(/[^\w.\-]/g,'_');
@@ -556,7 +579,7 @@ async function uploadFile(file,fallbackName){
 function pickFile(){document.getElementById('fileInput').click();}
 async function onFilePicked(e){var f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;toast('Envoi…');var up=await uploadFile(f);if(!up)return;var kind=(f.type||'').indexOf('image/')===0?'image':'file';await sendMediaMsg(kind,up.url,up.name);}
 async function sendMediaMsg(kind,url,fname){var row={auteur:myName(),texte:'',kind:kind,url:url,fname:fname||null};if(DEMO){row.id='m'+Math.random();row.created_at=new Date().toISOString();MSGS.push(row);renderChat();return;}var res=await supa.from('messages').insert(row).select();if(res.error){toast('Envoi impossible : '+res.error.message);return;}if(res.data&&res.data[0]&&!MSGS.find(function(x){return x.id===res.data[0].id;})){MSGS.push(res.data[0]);renderChat();}notifyMsg(kind==='image'?'Photo':(kind==='audio'?'Message vocal':'Fichier'));}
-function msgBody(m){if(m.kind==='image')return '<a href="'+m.url+'" target="_blank"><img class="msg-img" src="'+m.url+'"></a>';if(m.kind==='audio')return '<audio class="msg-audio" controls src="'+m.url+'"></audio>';if(m.kind==='file')return '<a class="msg-file" href="'+m.url+'" target="_blank"><span class="ic">description</span>'+esc(m.fname||'Fichier')+'</a>';return esc(m.texte);}
+function msgBody(m){if(m.kind==='image')return '<a href="'+m.url+'" target="_blank" onclick="event.stopPropagation()"><img class="msg-img" src="'+m.url+'"></a>';if(m.kind==='audio')return '<audio class="msg-audio" controls src="'+m.url+'" onclick="event.stopPropagation()"></audio>';if(m.kind==='file')return '<a class="msg-file" href="'+m.url+'" target="_blank" onclick="event.stopPropagation()"><span class="ic">description</span>'+esc(m.fname||'Fichier')+'</a>';return esc(m.texte);}
 var mediaRec=null,recChunks=[];
 async function toggleRecord(){
   var btn=document.getElementById('micBtn');
