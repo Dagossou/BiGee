@@ -249,14 +249,13 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 .bubble.me .apl-wave{color:var(--green-ink)}
 .bubble.them .apl-wave{color:var(--green-tx)}
 .apl-time{font-size:10.5px;font-variant-numeric:tabular-nums;opacity:.7;min-width:28px;text-align:right}
-.qposter{position:relative;overflow:hidden;border-radius:24px;padding:34px 26px 30px;background:radial-gradient(120% 90% at 15% 10%,#123049,#0a1b2c 70%);min-height:calc(100vh - 250px);display:flex;flex-direction:column;justify-content:center;box-shadow:0 18px 40px -18px rgba(0,0,0,.55);cursor:pointer}
-.qswirl{position:absolute;top:0;left:0;width:100%;height:175px;pointer-events:none}
-.qswirl path{fill:none;stroke:var(--green);stroke-width:2.4;stroke-linecap:round}
-.qbadge{position:absolute;top:20px;right:20px;width:52px;height:52px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;color:#0a1b2c;box-shadow:0 6px 18px -6px rgba(93,224,92,.6)}
-.qbadge .ic{font-size:27px;font-variation-settings:'FILL' 1}
-.qmark{color:var(--green);font-family:Georgia,'Times New Roman',serif;font-size:72px;line-height:.9;height:40px;display:block;margin-bottom:4px}
-.qtext{margin:0;color:#eef5f3;font-size:27px;font-weight:500;line-height:1.3;letter-spacing:-.4px}
-.qauth{display:block;margin-top:26px;color:var(--green);font-weight:700;font-size:15px}
+.qcard{position:relative;overflow:hidden;border-radius:22px;padding:26px 24px 24px;background:radial-gradient(135% 85% at 100% 0,#0f5236,#083425 62%);box-shadow:0 16px 34px -18px rgba(0,0,0,.5);cursor:pointer}
+.qcard::before{content:"";position:absolute;top:-42px;right:-32px;width:130px;height:130px;border-radius:50%;border:16px solid rgba(150,230,170,.09)}
+.qcard::after{content:"";position:absolute;bottom:-54px;left:-44px;width:160px;height:160px;border-radius:50%;border:16px solid rgba(150,230,170,.07)}
+.qcmark{position:relative;display:block;color:var(--green);font-family:Georgia,'Times New Roman',serif;font-weight:800;font-size:82px;line-height:.7;height:48px;margin-bottom:16px}
+.qctext{position:relative;margin:0;color:#f2faf4;font-size:24px;font-weight:500;line-height:1.34;letter-spacing:-.3px}
+.qctext b{color:var(--green);font-weight:800}
+.qcauth{position:relative;display:block;margin-top:18px;color:var(--green);font-weight:700;font-size:13px}
 .badge{position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--coral,#ff5a5f);color:#fff;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 2px var(--card)}
 .badge.on{display:flex}
 .ico-btn{position:relative}
@@ -424,13 +423,14 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
       </div>
 
       <div class="pane" id="p-focus">
-        <div class="qposter" onclick="pickQuote()">
-          <svg class="qswirl" viewBox="0 0 360 175" preserveAspectRatio="xMidYMin meet"><path d="M -25 78 C 70 18 152 18 208 60 C 240 84 208 126 181 108 C 158 93 178 60 214 60 C 272 60 306 30 388 4"/></svg>
-          <span class="qbadge"><span class="ic">bolt</span></span>
-          <span class="qmark">“</span>
-          <p class="qtext" id="quoteText">…</p>
-          <span class="qauth" id="quoteAuth"></span>
+        <div class="qcard" onclick="pickQuote()">
+          <span class="qcmark">“</span>
+          <p class="qctext" id="quoteText">…</p>
+          <span class="qcauth" id="quoteAuth"></span>
         </div>
+        <div class="seg" id="segFocus" style="margin-top:16px"><button class="act" data-r="Diana">Diana</button><button data-r="Daniel">Daniel</button></div>
+        <div class="section-title">Tâches du jour</div>
+        <div id="focusList"></div>
       </div>
 
       <div class="pane" id="p-detail">
@@ -601,7 +601,7 @@ var DICT={
 "Je suis Diana":"I'm Diana","Je suis Daniel":"I'm Daniel","Clé anon / publishable":"anon / publishable key","Changer de compte":"Switch account","Se déconnecter":"Sign out",
 "Cette semaine":"This week","En cours":"In progress","Par personne":"Per person","Progression par mois":"Monthly progress","Progression":"Progress",
 "Tous":"All","À faire":"To do","Fait":"Done","Ajouter une action":"Add a task","Ajouter":"Add",
-"Focus du jour":"Today's focus","À faire en priorité":"Priority first","Démarrer":"Start","Reprendre":"Resume","Pause":"Pause",
+"Focus du jour":"Today's focus","À faire en priorité":"Priority first","Tâches du jour":"Today's tasks","Démarrer":"Start","Reprendre":"Resume","Pause":"Pause",
 "Détail de l'action":"Task details","Modifier":"Edit","Supprimer":"Delete","Statut":"Status","Rappels":"Reminders","Preuve":"Proof","Joindre une preuve":"Attach proof",
 "Enregistrer":"Save","Modifier l'action":"Edit task","Assigner à":"Assign to","Date (optionnel)":"Date (optional)","Rappels — minutes avant l'heure":"Reminders — minutes before time",
 "À l'heure":"On time","Catégorie":"Category","Titre":"Title","Heure":"Time","Durée":"Duration","Sous-étapes":"Sub-steps","Retirer la preuve":"Remove proof",
@@ -944,7 +944,7 @@ var QUOTES=[
  {fr:"Avance à deux : ensemble, on va plus loin.",en:"Move together: together we go further.",a:""}
 ];
 var _lastQ=-1;
-function pickQuote(){var t=document.getElementById('quoteText'),a=document.getElementById('quoteAuth');if(!t)return;var i=Math.floor(Math.random()*QUOTES.length);if(QUOTES.length>1&&i===_lastQ)i=(i+1)%QUOTES.length;_lastQ=i;var q=QUOTES[i];t.textContent=(LANG==='en'?q.en:q.fr);if(a)a.textContent=q.a?('— '+q.a):'';}
+function pickQuote(){var t=document.getElementById('quoteText'),a=document.getElementById('quoteAuth');if(!t)return;var i=Math.floor(Math.random()*QUOTES.length);if(QUOTES.length>1&&i===_lastQ)i=(i+1)%QUOTES.length;_lastQ=i;var q=QUOTES[i];var txt=(LANG==='en'?q.en:q.fr);var sp=txt.indexOf(' ');if(sp>0){t.innerHTML='<b>'+esc(txt.slice(0,sp))+'</b> '+esc(txt.slice(sp+1));}else{t.textContent=txt;}if(a)a.textContent=q.a?('• '+q.a):'';}
 
 function demoData(){
   const mk=(r,sem,ord,titre,prio,dur,cat,dod,subs,statut,mois)=>({id:r+sem+ord+Math.random(),responsable:r,semaine:sem,mois:mois||MONTH(sem),ordre:ord,titre:titre,priorite:prio,duree:dur,categorie:cat,dod:dod,sous_etapes:subs,statut:statut,heure_prevue:null});
