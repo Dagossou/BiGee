@@ -700,9 +700,10 @@ async function pickWho(name){
 }
 async function loadActions(){const {data,error}=await supa.from('actions').select('*').order('semaine').order('responsable').order('ordre');if(error){toast('Erreur de chargement');ACTIONS=[];return;}ACTIONS=data||[];}
 function subscribe(){supa.channel('bigee-actions').on('postgres_changes',{event:'*',schema:'public',table:'actions'},async (p)=>{
-  try{var mine=myName();var nw=(p&&p.new)||{},od=(p&&p.old)||{};
+  try{var mine=myName();var nw=(p&&p.new)||{},od=(p&&p.old)||{};var myId=(USER&&USER.id)||null;
     if(p.eventType==='INSERT'&&!_myInserts[nw.id]&&(nw.responsable===mine||nw.responsable==='Couple')){pushNotif('task','Nouvelle tâche',nw.titre||'');}
     else if(p.eventType==='UPDATE'&&(nw.responsable===mine||nw.responsable==='Couple')&&od.responsable&&od.responsable!==nw.responsable){pushNotif('task','Tâche assignée',nw.titre||'');}
+    else if(p.eventType==='UPDATE'&&nw.statut==='fait'&&od.statut&&od.statut!=='fait'&&nw.fait_par&&nw.fait_par!==myId){pushNotif('task','Tâche terminée',(nw.titre||''));toast('✅ Terminée : '+(nw.titre||'').slice(0,30));}
   }catch(e){}
   await loadActions();renderAll();}).subscribe();}
 
@@ -710,6 +711,7 @@ function doneOf(r){return ACTIONS.filter(a=>a.responsable===r&&a.statut==='fait'
 function totOf(r){return ACTIONS.filter(a=>a.responsable===r).length;}
 async function persist(id,patch){const a=ACTIONS.find(x=>x.id===id);if(a)Object.assign(a,patch);renderAll();if(DEMO)return;let r=await supa.from('actions').update(patch).eq('id',id);if(r.error){const p2=Object.assign({},patch);delete p2.date_prevue;delete p2.rappels;const r2=await supa.from('actions').update(p2).eq('id',id);if(r2.error){toast('Sauvegarde impossible : '+r2.error.message);}else{toast('Enregistré (lance add_date.sql + add_rappels.sql pour date & rappels)');}}}
 async function notifyAssign(id){if(DEMO||!supa||!id)return;try{await supa.functions.invoke('notify',{body:{action_id:id}});}catch(e){}}
+async function notifyDone(titre){if(DEMO||!supa)return;try{await supa.functions.invoke('notify',{body:{done:true,from:myName(),titre:titre||'une tâche'}});}catch(e){}}
 function myName(){return (USER&&USER.user_metadata&&USER.user_metadata.prenom)||'Diana';}
 function otherName(){return myName()==='Diana'?'Daniel':'Diana';}
 function canEdit(resp){return resp===myName()||resp==='Couple';}
@@ -817,8 +819,8 @@ function pickProof(){if(CUR&&!canEdit(CUR.responsable)){toast('Lecture seule');r
 async function onProofPicked(e){var f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;toast('Envoi de la preuve…');var up=await uploadFile(f);if(!up)return;await persist(CUR.id,{preuve_url:up.url,preuve_name:up.name});renderProof();toast('Preuve ajoutée');}
 async function removeProof(){await persist(CUR.id,{preuve_url:null,preuve_name:null});renderProof();toast('Preuve retirée');}
 function renderProof(){var el=document.getElementById('dProof');if(!el)return;var a=CUR;if(!a||!a.preuve_url){el.innerHTML='<p class="sub">Aucune preuve pour l\'instant.</p>';return;}var isImg=/\.(png|jpe?g|gif|webp|heic|bmp)(\?|$)/i.test(a.preuve_url);el.innerHTML=(isImg?'<a href="'+a.preuve_url+'" target="_blank"><img src="'+a.preuve_url+'"></a>':'<a href="'+a.preuve_url+'" target="_blank"><span class="ic">description</span>'+esc(a.preuve_name||'Fichier')+'</a>')+(canEdit(a.responsable)?'<div><button class="rm" onclick="removeProof()">Retirer la preuve</button></div>':'');}
-function cycle(id){const a=ACTIONS.find(x=>x.id===id);if(!a)return;if(!canEdit(a.responsable)){toast('Lecture seule — tâche de '+a.responsable);return;}const nx={a_faire:'en_cours',en_cours:'fait',fait:'a_faire'}[a.statut];persist(id,{statut:nx,fait_le:nx==='fait'?new Date().toISOString():null,fait_par:nx==='fait'?((USER&&USER.id)||null):null});if(nx==='fait')celebrate('Bravo ! 🎉 Tâche accomplie');}
-function setStatut(s){if(!canEdit(CUR.responsable)){toast('Lecture seule');return;}const was=CUR.statut;persist(CUR.id,{statut:s,fait_le:s==='fait'?new Date().toISOString():null});renderDetail();if(s==='fait'&&was!=='fait')celebrate('Bravo ! 🎉 Tâche accomplie');}
+function cycle(id){const a=ACTIONS.find(x=>x.id===id);if(!a)return;if(!canEdit(a.responsable)){toast('Lecture seule — tâche de '+a.responsable);return;}const nx={a_faire:'en_cours',en_cours:'fait',fait:'a_faire'}[a.statut];persist(id,{statut:nx,fait_le:nx==='fait'?new Date().toISOString():null,fait_par:nx==='fait'?((USER&&USER.id)||null):null});if(nx==='fait'){celebrate('Bravo ! 🎉 Tâche accomplie');notifyDone(a.titre);}}
+function setStatut(s){if(!canEdit(CUR.responsable)){toast('Lecture seule');return;}const was=CUR.statut;persist(CUR.id,{statut:s,fait_le:s==='fait'?new Date().toISOString():null,fait_par:s==='fait'?((USER&&USER.id)||null):null});renderDetail();if(s==='fait'&&was!=='fait'){celebrate('Bravo ! 🎉 Tâche accomplie');notifyDone(CUR.titre);}}
 function setHeure(){const t=document.getElementById('dTime').value||null;persist(CUR.id,{heure_prevue:t,rappel_at:null});renderRem();toast(t?'Rappels : 15 min, 5 min avant, et à l’heure':'Heure retirée');}
 
 function initApp(){
