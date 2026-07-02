@@ -71,6 +71,25 @@ input.tf:focus{outline:none;border-color:var(--green)}
 .greet{padding:4px 2px 18px}
 .greet h2{margin:0;font-size:23px;font-weight:800;letter-spacing:-.6px}
 .greet p{margin:5px 0 0;color:var(--muted);font-size:13px;font-weight:500;text-transform:capitalize}
+.hero{background:var(--nuit);color:var(--papier);border-radius:22px;padding:20px;display:flex;align-items:center;gap:18px;margin-bottom:16px}
+.hero-ring{width:106px;height:106px;border-radius:50%;flex:none;background:conic-gradient(var(--green) calc(var(--p,0)*1%),rgba(255,255,255,.12) 0);display:flex;align-items:center;justify-content:center}
+.hero-ring-in{width:84px;height:84px;border-radius:50%;background:var(--nuit);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.hero-ring-in b{font-size:25px;font-weight:800;letter-spacing:-.5px}
+.hero-ring-in small{font-size:9.5px;opacity:.7;margin-top:3px}
+.hero-stats{flex:1;display:flex;flex-direction:column;gap:13px}
+.hs-lab{font-size:10px;opacity:.6;font-weight:700;text-transform:uppercase;letter-spacing:.6px;display:block}
+.hs-val{font-size:20px;font-weight:800;letter-spacing:-.3px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mring{text-align:center}
+.mring .r{width:66px;height:66px;margin:0 auto 8px;border-radius:50%;background:conic-gradient(var(--c,#3CDE4B) calc(var(--p,0)*1%),var(--chip) 0);display:flex;align-items:center;justify-content:center}
+.mring .r b{width:52px;height:52px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.mring .nm{font-size:12px;font-weight:800}
+.mring .fr{font-size:10px;color:var(--muted);margin-top:1px}
+.mbars{display:flex;align-items:flex-end;gap:9px;height:128px;margin-top:8px}
+.mbars .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%}
+.mbars .barwrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.mbars .bar{width:64%;border-radius:8px 8px 0 0;background:var(--green);min-height:3px}
+.mbars small{font-size:10px;color:var(--muted);font-weight:700}
 .btn-primary{margin:12px 0 14px;width:100%;border:none;border-radius:14px;padding:14px;background:var(--green);color:var(--green-ink);font-weight:800;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
 .btn-primary svg{width:18px;height:18px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}
@@ -283,23 +302,30 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
   <div class="screen hide" id="screen-app">
     <div class="appbar">
       <div class="brand"><span class="logo"><svg class="i"><use href="#chevrons"/></svg></span>BiGee</div>
-      <div class="grp"><div class="ico-btn" onclick="navTo('messages')" title="Messages"><svg class="i"><use href="#chat"/></svg></div><div class="ico-btn" onclick="navTo('apercu')" title="Vue d'ensemble"><svg class="i"><use href="#grid"/></svg></div><div class="ico-btn" onclick="enableNotifications()" title="Activer les rappels"><svg class="i"><use href="#bell"/></svg></div><div class="ico-btn" onclick="logout()"><svg class="i"><use href="#logout"/></svg></div></div>
+      <div class="grp"><div class="ico-btn" onclick="navTo('objectifs')" title="Objectifs"><svg class="i"><use href="#target"/></svg></div><div class="ico-btn" onclick="navTo('apercu')" title="Vue d'ensemble"><svg class="i"><use href="#grid"/></svg></div><div class="ico-btn" onclick="enableNotifications()" title="Activer les rappels"><svg class="i"><use href="#bell"/></svg></div><div class="ico-btn" onclick="logout()"><svg class="i"><use href="#logout"/></svg></div></div>
     </div>
     <div class="body">
 
       <div class="pane on" id="p-accueil">
         <div class="greet"><h2 id="gHello">Bonjour</h2><p id="gDate"></p></div>
 
-        <div class="card feature" onclick="navTo('semaine')" style="cursor:pointer">
-          <span class="tag"><span class="dot"></span> Cette semaine</span>
-          <h4 id="fWeek">Semaine 1</h4>
-          <div class="fmeta"><span id="fCount2">0 / 0 faites</span></div>
-          <div class="ringF" style="--p:0"><b id="fRing">0%<small>avancé</small></b></div>
+        <div class="hero">
+          <div class="hero-ring" id="heroRing" style="--p:0"><div class="hero-ring-in"><b id="heroPct">0%</b><small id="heroFrac">0 / 216</small></div></div>
+          <div class="hero-stats">
+            <div class="hstat"><span class="hs-lab">Cette semaine</span><span class="hs-val" id="hsWeek">0 / 0</span></div>
+            <div class="hstat"><span class="hs-lab">En cours</span><span class="hs-val" id="hsProg">0</span></div>
+            <div class="hstat"><span class="hs-lab">Semaine</span><span class="hs-val" id="hsNo">1</span></div>
+          </div>
         </div>
 
         <div class="card">
-          <h3>Progression</h3>
-          <div class="perbar" id="perbar"></div>
+          <h3>Par personne</h3>
+          <div class="trio" id="trio"></div>
+        </div>
+
+        <div class="card">
+          <h3>Progression par mois</h3>
+          <div class="mbars" id="mbars"></div>
         </div>
       </div>
 
@@ -395,7 +421,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
       <button data-p="semaine"><svg class="i"><use href="#list"/></svg>Semaine</button>
       <button class="fab" data-p="focus"><span class="fabic"><svg class="i"><use href="#bolt"/></svg></span></button>
       <button data-p="revue"><svg class="i"><use href="#calendar"/></svg>Revue</button>
-      <button data-p="objectifs"><svg class="i"><use href="#target"/></svg>Objectifs</button>
+      <button data-p="messages"><svg class="i"><use href="#chat"/></svg>Messages</button>
     </div>
   </div>
 
@@ -516,14 +542,19 @@ function renderAll(){renderAccueil();renderWeek();renderFocus();renderObj();rend
 function renderAccueil(){
   const d=new Date();
   document.getElementById('gDate').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  const totDone=doneOf('Diana')+doneOf('Daniel')+doneOf('Couple');
+  const totAll=ACTIONS.length||0;
+  const g=totAll?Math.round(totDone/totAll*100):0;
+  document.getElementById('heroRing').style.setProperty('--p',g);
+  document.getElementById('heroPct').textContent=g+'%';
+  document.getElementById('heroFrac').textContent=totDone+' / '+totAll;
   const wk=ACTIONS.filter(a=>a.semaine===CURW);
-  const wkDone=wk.filter(a=>a.statut==='fait').length;
-  document.getElementById('fWeek').textContent='Semaine '+CURW+' · Mois '+MONTH(CURW);
-  document.getElementById('fCount2').textContent=wkDone+' / '+wk.length+' faites';
-  const wpct=wk.length?Math.round(wkDone/wk.length*100):0;
-  document.querySelector('.ringF').style.setProperty('--p',wpct);
-  document.getElementById('fRing').innerHTML=wpct+'%<small>avancé</small>';
-  document.getElementById('perbar').innerHTML=RESP.map(function(r){var dn=doneOf(r),t=totOf(r)||1,p=Math.round(dn/t*100);return '<div class="r"><span style="color:'+COLS[r]+'">'+r+'</span><span style="color:var(--muted)">'+dn+' / '+totOf(r)+'</span></div><div class="trk"><i style="width:'+p+'%;background:'+COLS[r]+'"></i></div>';}).join('');
+  document.getElementById('hsWeek').textContent=wk.filter(a=>a.statut==='fait').length+' / '+wk.length;
+  document.getElementById('hsProg').textContent=ACTIONS.filter(a=>a.statut==='en_cours').length;
+  document.getElementById('hsNo').textContent=CURW;
+  document.getElementById('trio').innerHTML=RESP.map(function(r){var dn=doneOf(r),t=totOf(r)||1,p=Math.round(dn/t*100);return '<div class="mring"><div class="r" style="--p:'+p+';--c:'+COLS[r]+'"><b>'+p+'%</b></div><div class="nm" style="color:'+COLS[r]+'">'+r+'</div><div class="fr">'+dn+' / '+totOf(r)+'</div></div>';}).join('');
+  var mb='';for(var m=1;m<=6;m++){var cell=ACTIONS.filter(function(a){return a.mois===m;});var t=cell.length,dn=cell.filter(function(a){return a.statut==='fait';}).length;var p=t?Math.round(dn/t*100):0;mb+='<div class="col"><div class="barwrap"><div class="bar" style="height:'+Math.max(p,2)+'%"></div></div><small>M'+m+'</small></div>';}
+  document.getElementById('mbars').innerHTML=mb;
 }
 function buildHeat(){
   let h='<div class="hh"></div>';
