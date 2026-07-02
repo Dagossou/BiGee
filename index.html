@@ -425,8 +425,8 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
       <div class="pane" id="p-focus">
         <div class="qcard" onclick="pickQuote()">
           <span class="qcmark">“</span>
-          <p class="qctext" id="quoteText">…</p>
-          <span class="qcauth" id="quoteAuth"></span>
+          <p class="qctext" id="quoteText" style="font-size:34px">…</p>
+          <span class="qcauth" id="quoteAuth" style="font-size:22px"></span>
         </div>
         <div class="seg" id="segFocus" style="margin-top:16px"><button class="act" data-r="Diana">Diana</button><button data-r="Daniel">Daniel</button></div>
         <div class="section-title">Tâches du jour</div>
@@ -963,7 +963,7 @@ function demoData(){
 }
 
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&INAPP&&!DEMO&&supa){loadActions().then(renderAll).catch(function(){});}});
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').then(function(reg){try{reg.update();}catch(e){}}).catch(function(){});var _swReloaded=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(_swReloaded)return;_swReloaded=true;location.reload();});}
 boot();
 </script>
 </body>
