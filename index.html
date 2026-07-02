@@ -401,7 +401,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
   <div class="screen hide" id="screen-app">
     <div class="appbar">
       <div class="brand"><span class="logo"><svg class="i"><use href="#chevrons"/></svg></span>BiGee</div>
-      <div class="grp"><div class="ico-btn" onclick="navTo('objectifs')" title="Objectifs"><svg class="i"><use href="#target"/></svg></div><div class="ico-btn" onclick="navTo('apercu')" title="Vue d'ensemble"><svg class="i"><use href="#grid"/></svg></div><div class="ico-btn" onclick="openNotifs()" title="Notifications"><svg class="i"><use href="#bell"/></svg><span class="badge" id="notifBadge"></span></div><div class="ico-btn" onclick="logout()"><svg class="i"><use href="#logout"/></svg></div></div>
+      <div class="grp"><div class="ico-btn" onclick="navTo('apercu')" title="Vue d'ensemble"><svg class="i"><use href="#grid"/></svg></div><div class="ico-btn" onclick="openNotifs()" title="Notifications" style="display:none"><svg class="i"><use href="#bell"/></svg><span class="badge" id="notifBadge"></span></div><div class="ico-btn" onclick="logout()" style="display:none"><svg class="i"><use href="#logout"/></svg></div></div>
     </div>
     <div class="body">
 
@@ -486,19 +486,6 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
         <div id="revHist"></div>
       </div>
 
-      <div class="pane" id="p-objectifs">
-        <div class="section-title">Objectifs des 6 mois</div>
-        <div class="obj-card"><div class="oh"><span class="obj-ic" style="background:var(--daniel-bg);color:var(--daniel-tx)"><svg class="i"><use href="#repeat"/></svg></span><div><b>Revenu régulier ≥ 500 $/mois</b><div class="ech">Daniel · échéance : mois 6</div></div><span class="opct" style="color:var(--green-tx)" id="oDaniel">0%</span></div><div class="track"><i id="oDanielBar" style="width:0%"></i></div><div class="ind"><span><svg class="i"><use href="#check"/></svg> <span id="oDanielDone">0</span> actions faites</span></div></div>
-        <div class="obj-card"><div class="oh"><span class="obj-ic" style="background:var(--diana-bg);color:var(--diana-tx)"><svg class="i"><use href="#briefcase"/></svg></span><div><b>Décrocher un meilleur emploi</b><div class="ech">Diana · échéance : mois 6</div></div><span class="opct" style="color:var(--green-tx)" id="oDiana">0%</span></div><div class="track"><i id="oDianaBar" style="width:0%"></i></div><div class="ind"><span><svg class="i"><use href="#check"/></svg> <span id="oDianaDone">0</span> actions faites</span></div></div>
-        <div class="obj-card"><div class="oh"><span class="obj-ic" style="background:var(--couple-bg);color:var(--couple-tx)"><svg class="i"><use href="#users"/></svg></span><div><b>Coordination &amp; rituels tenus</b><div class="ech">Couple · continu</div></div><span class="opct" style="color:var(--green-tx)" id="oCouple">0%</span></div><div class="track"><i id="oCoupleBar" style="width:0%"></i></div><div class="ind"><span><svg class="i"><use href="#calendar"/></svg> <span id="oCoupleDone">0</span> actions faites</span></div></div>
-        <div class="section-title" style="margin-top:16px">Indicateurs de progression</div>
-        <div class="metrics">
-          <div class="metric"><div class="val" id="iPct">0%</div><div class="lab">Actions du plan faites</div></div>
-          <div class="metric"><div class="val" id="iDone">0</div><div class="lab">Actions terminées</div></div>
-        </div>
-        <div class="section-title" style="margin-top:16px">Statistiques</div>
-        <div class="card" id="statsCard"></div>
-      </div>
 
       <div class="pane" id="p-apercu">
         <div class="section-title">Vue d'ensemble</div>
@@ -948,6 +935,7 @@ async function saveRevue(){var marche=(document.getElementById('rMarche').value|
   renderRevHist();celebrate('Revue enregistrée ✓');}
 function renderRevHist(){var el=document.getElementById('revHist');if(!el)return;if(!REVUES.length){el.innerHTML='';return;}var h='<div class="section-title" style="margin-top:16px">Historique des revues</div>';h+=REVUES.slice(0,12).map(function(v){var d=v.created_at?new Date(v.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):'';return '<div class="card" style="padding:13px"><div class="hrow"><b style="font-size:13px">Semaine '+v.semaine+'</b><span style="font-size:11px;color:var(--muted)">'+esc(v.auteur||'')+' · '+d+'</span></div>'+(v.marche?'<p class="sub" style="margin:7px 0 0">✅ '+esc(v.marche)+'</p>':'')+(v.bloque?'<p class="sub" style="margin:4px 0 0">⚡ '+esc(v.bloque)+'</p>':'')+(v.decisions?'<p class="sub" style="margin:4px 0 0">🎯 '+esc(v.decisions)+'</p>':'')+'</div>';}).join('');el.innerHTML=h;}
 function renderObj(){
+  if(!document.getElementById('iPct'))return;
   const totDone=doneOf('Diana')+doneOf('Daniel')+doneOf('Couple');
   const pct=ACTIONS.length?Math.round(totDone/ACTIONS.length*100):0;
   document.getElementById('iPct').textContent=pct+'%';
