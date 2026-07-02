@@ -65,15 +65,16 @@ input.tf:focus{outline:none;border-color:var(--green)}
 .brand .logo{width:30px;height:30px;border-radius:10px;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center}
 .ico-btn{width:36px;height:36px;border-radius:11px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink);cursor:pointer}
 .grp{display:flex;gap:8px}
-.body{flex:1;overflow-y:auto;padding:6px 16px 96px}
+.body{flex:1;overflow-y:auto;padding:10px 18px 104px}
 .pane{display:none}.pane.on{display:block}
 .who{font-size:11px;color:var(--muted);font-weight:600;padding:0 2px 8px}.who b{color:var(--green-tx)}
-.greet h2{margin:2px 0 0;font-size:21px;font-weight:800;letter-spacing:-.5px}
-.greet p{margin:3px 0 0;color:var(--muted);font-size:12.5px;font-weight:500}
+.greet{padding:4px 2px 18px}
+.greet h2{margin:0;font-size:23px;font-weight:800;letter-spacing:-.6px}
+.greet p{margin:5px 0 0;color:var(--muted);font-size:13px;font-weight:500;text-transform:capitalize}
 .btn-primary{margin:12px 0 14px;width:100%;border:none;border-radius:14px;padding:14px;background:var(--green);color:var(--green-ink);font-weight:800;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
 .btn-primary svg{width:18px;height:18px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:13px}
-.card h3{margin:0;font-size:12px;font-weight:800;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:.4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}
+.card h3{margin:0;font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px;letter-spacing:-.2px}
 .card .exp{margin-left:auto;color:var(--muted)}
 .sub{color:var(--muted);font-size:11.5px;margin:2px 0 0;font-weight:500;text-transform:none;letter-spacing:0}
 .hrow{display:flex;align-items:center;justify-content:space-between}
@@ -117,7 +118,7 @@ input.tf:focus{outline:none;border-color:var(--green)}
 .seg{display:flex;background:var(--chip);border-radius:14px;padding:4px;margin:4px 0 12px}
 .seg button{flex:1;border:none;background:none;padding:9px 0;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
 .seg button.act{background:var(--card);color:var(--ink)}
-.section-title{font-size:10.5px;font-weight:800;color:var(--muted);margin:2px 2px 10px;text-transform:uppercase;letter-spacing:.7px}
+.section-title{font-size:13px;font-weight:800;color:var(--ink);margin:6px 2px 12px;letter-spacing:-.2px}
 .weeknav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .weeknav button{width:36px;height:36px;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .weeknav .wl{font-weight:800;font-size:13.5px}
@@ -288,43 +289,17 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 
       <div class="pane on" id="p-accueil">
         <div class="greet"><h2 id="gHello">Bonjour</h2><p id="gDate"></p></div>
-        <button class="btn-primary" onclick="navTo('revue')"><svg class="i"><use href="#users"/></svg> Faire le point ensemble</button>
-        <div class="metrics">
-          <div class="metric"><div class="top"><span class="msq" style="background:var(--green-bg);color:var(--green-tx)"><svg class="i"><use href="#check"/></svg></span><span class="up" id="mDoneBadge"><svg class="i" style="width:11px;height:11px"><use href="#trend"/></svg>0%</span></div><div class="val" id="mDone">0</div><div class="lab" id="mDoneL">Actions faites / 216</div></div>
-          <div class="metric"><div class="top"><span class="msq" style="background:var(--couple-bg);color:var(--couple-tx)"><svg class="i"><use href="#bolt"/></svg></span><span class="up" id="mWeekBadge">0 tâches</span></div><div class="val" id="mWeek">0</div><div class="lab">Faites cette semaine</div></div>
-        </div>
-        <div class="card feature">
-          <span class="tag"><span class="dot"></span> Semaine en cours</span>
-          <h4 id="fWeek">Semaine 1 · Mois 1</h4>
-          <div class="fmeta"><span><svg class="i"><use href="#list"/></svg> <span id="fCount">9</span> actions</span></div>
+
+        <div class="card feature" onclick="navTo('semaine')" style="cursor:pointer">
+          <span class="tag"><span class="dot"></span> Cette semaine</span>
+          <h4 id="fWeek">Semaine 1</h4>
+          <div class="fmeta"><span id="fCount2">0 / 0 faites</span></div>
           <div class="ringF" style="--p:0"><b id="fRing">0%<small>avancé</small></b></div>
         </div>
+
         <div class="card">
-          <div class="hrow"><h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#users"/></svg> Répartition des actions</h3><span class="exp" onclick="navTo('semaine')"><svg class="i" style="width:16px"><use href="#arrow-ur"/></svg></span></div>
-          <div class="donut-wrap">
-            <div class="donut" id="donut"><div class="hole"><b id="donutTot">216</b><span>au total</span></div></div>
-            <div class="legend">
-              <div class="lg"><span class="sw" style="background:var(--diana)"></span>Diana<span class="pct" id="lgD">72</span></div>
-              <div class="lg"><span class="sw" style="background:var(--daniel)"></span>Daniel<span class="pct" id="lgN">72</span></div>
-              <div class="lg"><span class="sw" style="background:var(--couple)"></span>Couple<span class="pct" id="lgC">72</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="card obj">
-          <div class="hrow"><h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#target"/></svg> Objectif — Daniel</h3><span class="exp" onclick="navTo('objectifs')"><svg class="i" style="width:16px"><use href="#arrow-ur"/></svg></span></div>
-          <p class="sub">Mettre en place un revenu régulier ≥ 500 $/mois d'ici le mois 6</p>
-          <div style="margin-top:12px" class="hrow"><div class="amt"><span id="objDPct">0%</span> <small>vers l'objectif</small></div><span class="stat-pill st-prog">en bonne voie</span></div>
-          <div class="track"><i id="objDBar" style="width:0%"></i></div>
-          <div class="milestones"><span>M1</span><span>M2</span><span>M3</span><span>M4</span><span>M5</span><b>M6 · objectif</b></div>
-        </div>
-        <div class="card">
-          <div class="hrow"><h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#trend"/></svg> Progression par mois</h3></div>
-          <div class="heat" id="heat"></div>
-          <div class="heat-legend"><span>moins</span><span class="s" style="background:var(--h0)"></span><span class="s" style="background:var(--h1)"></span><span class="s" style="background:var(--h2)"></span><span class="s" style="background:var(--h3)"></span><span class="s" style="background:var(--h4)"></span><span>plus</span></div>
-        </div>
-        <div class="card">
-          <div class="hrow"><h3><svg class="i" style="width:15px;stroke:var(--green)"><use href="#bolt"/></svg> Tâches prioritaires — cette semaine</h3></div>
-          <table class="ptab"><thead><tr><th>Priorité</th><th>Axe</th><th>Statut</th></tr></thead><tbody id="ptab"></tbody></table>
+          <h3>Progression</h3>
+          <div class="perbar" id="perbar"></div>
         </div>
       </div>
 
@@ -341,7 +316,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
           <div class="tbtn"><button class="go" id="startBtn" onclick="toggleTimer()"><svg class="i"><use href="#play"/></svg><span>Démarrer</span></button><button class="rs" onclick="resetTimer()"><svg class="i"><use href="#refresh"/></svg></button></div>
         </div>
         <div class="seg" id="segFocus"><button class="act" data-r="Diana">Diana</button><button data-r="Daniel">Daniel</button></div>
-        <div class="section-title">Priorité haute d'abord · semaine en cours</div>
+        <div class="section-title">À faire en priorité</div>
         <div id="focusList"></div>
       </div>
 
@@ -392,13 +367,10 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
           <div class="metric"><div class="val" id="iPct">0%</div><div class="lab">Actions du plan faites</div></div>
           <div class="metric"><div class="val" id="iDone">0</div><div class="lab">Actions terminées</div></div>
         </div>
-        <div class="section-title" style="margin-top:16px">Habitudes à développer</div>
-        <div class="habit"><span class="hic" style="background:var(--diana-bg);color:var(--diana-tx)"><svg class="i"><use href="#briefcase"/></svg></span><div style="flex:1"><b>Postuler / relancer</b><span>5× / semaine · Diana</span><div class="dots"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i><i></i></div></div><span class="hc">3/5</span></div>
-        <div class="habit"><span class="hic" style="background:var(--daniel-bg);color:var(--daniel-tx)"><svg class="i"><use href="#trend"/></svg></span><div style="flex:1"><b>Créer du contenu</b><span>3× / semaine · Daniel</span><div class="dots"><i class="f"></i><i class="f"></i><i></i><i></i><i></i><i></i><i></i></div></div><span class="hc">2/3</span></div>
       </div>
 
       <div class="pane" id="p-apercu">
-        <div class="section-title">Vue d'ensemble — toutes les tâches</div>
+        <div class="section-title">Vue d'ensemble</div>
         <div class="seg" id="segMonth" style="flex-wrap:wrap;gap:3px">
           <button class="act" data-m="0">Tous</button>
           <button data-m="1">M1</button><button data-m="2">M2</button><button data-m="3">M3</button><button data-m="4">M4</button><button data-m="5">M5</button><button data-m="6">M6</button>
@@ -409,7 +381,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
       </div>
 
       <div class="pane" id="p-messages">
-        <div class="section-title">Messages — Diana &amp; Daniel</div>
+        <div class="section-title">Messages</div>
         <div id="chatList" class="chat-list"></div>
         <div class="composer">
           <input class="tf" id="chatInput" placeholder="Écris un message…" style="flex:1;margin:0" onkeydown="if(event.key==='Enter')sendMsg()">
@@ -542,31 +514,16 @@ window.addEventListener('popstate',function(ev){const p=(ev.state&&ev.state.pane
 function renderAll(){renderAccueil();renderWeek();renderFocus();renderObj();renderRevue();renderApercu();}
 
 function renderAccueil(){
-  const totDone=doneOf('Diana')+doneOf('Daniel')+doneOf('Couple');
-  const totAll=ACTIONS.length||1;
-  const g=Math.round(totDone/totAll*100);
-  document.getElementById('mDone').textContent=totDone;
-  document.getElementById('mDoneL').textContent='Actions faites / '+ACTIONS.length;
-  document.getElementById('mDoneBadge').innerHTML='<svg class="i" style="width:11px;height:11px"><use href="#trend"/></svg>'+g+'%';
   const d=new Date();
-  document.getElementById('gDate').textContent=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+' · Semaine '+CURW+' — Mois '+MONTH(CURW);
+  document.getElementById('gDate').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
   const wk=ACTIONS.filter(a=>a.semaine===CURW);
-  document.getElementById('mWeek').textContent=wk.filter(a=>a.statut==='fait').length;
-  document.getElementById('mWeekBadge').textContent=wk.length+' tâches';
+  const wkDone=wk.filter(a=>a.statut==='fait').length;
   document.getElementById('fWeek').textContent='Semaine '+CURW+' · Mois '+MONTH(CURW);
-  document.getElementById('fCount').textContent=wk.length;
-  const wpct=wk.length?Math.round(wk.filter(a=>a.statut==='fait').length/wk.length*100):0;
+  document.getElementById('fCount2').textContent=wkDone+' / '+wk.length+' faites';
+  const wpct=wk.length?Math.round(wkDone/wk.length*100):0;
   document.querySelector('.ringF').style.setProperty('--p',wpct);
   document.getElementById('fRing').innerHTML=wpct+'%<small>avancé</small>';
-  const tD=totOf('Diana'),tN=totOf('Daniel'),tC=totOf('Couple');
-  document.getElementById('donutTot').textContent=ACTIONS.length;
-  document.getElementById('lgD').textContent=tD;document.getElementById('lgN').textContent=tN;document.getElementById('lgC').textContent=tC;
-  const s1=totAll?tD/totAll*100:33.3, s2=totAll?(tD+tN)/totAll*100:66.6;
-  document.getElementById('donut').style.background='conic-gradient(var(--diana) 0 '+s1+'%,var(--daniel) '+s1+'% '+s2+'%,var(--couple) '+s2+'% 100%)';
-  const dnP=tN?Math.round(doneOf('Daniel')/tN*100):0;
-  document.getElementById('objDPct').textContent=dnP+'%';document.getElementById('objDBar').style.width=dnP+'%';
-  buildHeat();
-  buildPtab(wk);
+  document.getElementById('perbar').innerHTML=RESP.map(function(r){var dn=doneOf(r),t=totOf(r)||1,p=Math.round(dn/t*100);return '<div class="r"><span style="color:'+COLS[r]+'">'+r+'</span><span style="color:var(--muted)">'+dn+' / '+totOf(r)+'</span></div><div class="trk"><i style="width:'+p+'%;background:'+COLS[r]+'"></i></div>';}).join('');
 }
 function buildHeat(){
   let h='<div class="hh"></div>';
