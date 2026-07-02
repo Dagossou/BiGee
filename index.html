@@ -237,6 +237,38 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 @keyframes recpulse{0%,100%{opacity:1}50%{opacity:.6}}
 .msg-img{max-width:210px;border-radius:12px;display:block}
 .msg-audio{height:40px;max-width:230px;display:block}
+.apl{display:flex;align-items:center;gap:9px;min-width:200px;max-width:250px}
+.apl audio{display:none}
+.apl-btn{width:38px;height:38px;border-radius:50%;border:none;flex:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.apl-btn .ic{font-size:22px}
+.bubble.me .apl-btn{background:var(--green-ink);color:var(--papier)}
+.bubble.them .apl-btn{background:var(--green);color:var(--green-ink)}
+.apl-wave{flex:1;height:30px;display:flex;align-items:center;gap:2px;cursor:pointer}
+.apl-wave i{flex:1;min-width:2px;border-radius:2px;background:currentColor;opacity:.34;transition:opacity .12s}
+.apl-wave i.on{opacity:1}
+.bubble.me .apl-wave{color:var(--green-ink)}
+.bubble.them .apl-wave{color:var(--green-tx)}
+.apl-time{font-size:10.5px;font-variant-numeric:tabular-nums;opacity:.7;min-width:28px;text-align:right}
+.mquote{margin-top:14px;background:var(--green-bg);border-radius:16px;padding:15px 15px 15px 42px;position:relative;text-align:left}
+.mquote .qm{position:absolute;left:13px;top:2px;font-size:40px;line-height:1;color:var(--green-tx);opacity:.45;font-family:Georgia,'Times New Roman',serif}
+.mquote p{margin:0;font-size:14px;font-weight:600;line-height:1.5;color:var(--ink)}
+.mquote .qa{display:block;margin-top:8px;font-size:12px;font-weight:800;color:var(--green-tx)}
+.badge{position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--coral,#ff5a5f);color:#fff;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 2px var(--card)}
+.badge.on{display:flex}
+.ico-btn{position:relative}
+.nav button{position:relative}
+.ovl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ovl-head b{font-size:17px;font-weight:800}
+.lnk{background:none;border:none;color:var(--green-tx);font-weight:800;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:2px;padding:6px}
+.notif-list{max-height:56vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.notif{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.notif.unread{border-color:var(--green);background:var(--green-bg)}
+.notif .nic{width:34px;height:34px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--green-bg);color:var(--green-tx)}
+.notif .nic .ic{font-size:19px}
+.notif .nbody{flex:1;min-width:0}
+.notif .ntitle{font-weight:800;font-size:13px;display:flex;justify-content:space-between;gap:8px}
+.notif .ntime{font-size:10px;color:var(--muted);font-weight:600;flex:none}
+.notif .ntext{font-size:12.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .msg-file{display:flex;align-items:center;gap:8px;color:inherit;text-decoration:none;font-weight:700}
 .msg-file .ic{font-size:22px}
 .proof img{max-width:100%;border-radius:12px;display:block;margin-bottom:8px}
@@ -343,7 +375,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
   <div class="screen hide" id="screen-app">
     <div class="appbar">
       <div class="brand"><span class="logo"><svg class="i"><use href="#chevrons"/></svg></span>BiGee</div>
-      <div class="grp"><div class="ico-btn" onclick="navTo('objectifs')" title="Objectifs"><svg class="i"><use href="#target"/></svg></div><div class="ico-btn" onclick="navTo('apercu')" title="Vue d'ensemble"><svg class="i"><use href="#grid"/></svg></div><div class="ico-btn" onclick="enableNotifications()" title="Activer les rappels"><svg class="i"><use href="#bell"/></svg></div><div class="ico-btn" onclick="logout()"><svg class="i"><use href="#logout"/></svg></div></div>
+      <div class="grp"><div class="ico-btn" onclick="navTo('objectifs')" title="Objectifs"><svg class="i"><use href="#target"/></svg></div><div class="ico-btn" onclick="navTo('apercu')" title="Vue d'ensemble"><svg class="i"><use href="#grid"/></svg></div><div class="ico-btn" onclick="openNotifs()" title="Notifications"><svg class="i"><use href="#bell"/></svg><span class="badge" id="notifBadge"></span></div><div class="ico-btn" onclick="logout()"><svg class="i"><use href="#logout"/></svg></div></div>
     </div>
     <div class="body">
 
@@ -379,8 +411,9 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
       </div>
 
       <div class="pane" id="p-focus">
-        <div class="card focus-hd"><h3>Focus du jour</h3><p class="m" id="focusName">Tes 3 priorités — Diana</p><div class="timer" id="clock">25:00</div>
-          <div class="tbtn"><button class="go" id="startBtn" onclick="toggleTimer()"><svg class="i"><use href="#play"/></svg><span>Démarrer</span></button><button class="rs" onclick="resetTimer()"><svg class="i"><use href="#refresh"/></svg></button></div>
+        <div class="card focus-hd"><h3>Focus du jour</h3>
+          <div class="mquote"><span class="qm">“</span><p id="quoteText">…</p><span class="qa" id="quoteAuth"></span></div>
+          <p class="m" id="focusName" style="margin-top:12px">Tes 3 priorités — Diana</p>
         </div>
         <div class="seg" id="segFocus"><button class="act" data-r="Diana">Diana</button><button data-r="Daniel">Daniel</button></div>
         <div class="section-title">À faire en priorité</div>
@@ -474,7 +507,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
       <button data-p="semaine"><svg class="i"><use href="#list"/></svg>Semaine</button>
       <button data-p="focus"><svg class="i"><use href="#bolt"/></svg>Focus</button>
       <button data-p="revue"><svg class="i"><use href="#calendar"/></svg>Revue</button>
-      <button data-p="messages"><svg class="i"><use href="#chat"/></svg>Messages</button>
+      <button data-p="messages"><svg class="i"><use href="#chat"/></svg>Messages<span class="badge" id="msgBadge"></span></button>
     </div>
   </div>
 
@@ -489,6 +522,15 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
     </div>
   </div>
 
+  <div class="sheet hide" id="notifSheet" onclick="closeNotif(event)">
+    <div class="sheet-card">
+      <div class="ovl-head"><b id="notifTitle">Notifications</b><button class="lnk" onclick="markAllNotifs()"><span class="ic" style="font-size:18px">done_all</span>Tout lire</button></div>
+      <div id="notifList" class="notif-list"></div>
+      <button class="btn ghost" style="margin:12px 0 0" onclick="enableNotifications()"><span class="ic">notifications_active</span> Activer les rappels push</button>
+      <button class="cancel" onclick="closeNotif()">Fermer</button>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 </div>
 
@@ -498,7 +540,10 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 const SUPA_URL='https://sapojxjmrzjrfjiejgwv.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhcG9qeGptcnpqcmZqaWVqZ3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4ODY5MzgsImV4cCI6MjA5ODQ2MjkzOH0.kHd3h70SrDgd1S1H4GRd2hm8lbtCpJpoH8zJOkVF340';
 // =============================================
-const LS={week:'bigee_week'};
+const LS={week:'bigee_week',notif:'bigee_notifs'};
+var NOTIFS=[],_myInserts={};
+function loadNotifs(){try{NOTIFS=JSON.parse(localStorage.getItem(LS.notif)||'[]')||[];}catch(e){NOTIFS=[];}}
+function saveNotifs(){try{localStorage.setItem(LS.notif,JSON.stringify(NOTIFS.slice(-60)));}catch(e){}}
 let supa=null, DEMO=false, USER=null, ACTIONS=[], CURW=Number(localStorage.getItem(LS.week)||1), SEGR='Diana', FOCR='Diana', CUR=null, CURPANE='accueil', MODE='signin', INAPP=false, APM=0, WSTAT='all', APS='all', MSGS=[];
 const MONTH=w=>Math.ceil(w/4);
 const RESP=['Diana','Daniel','Couple'];
@@ -602,24 +647,29 @@ async function pickWho(name){
   await loadActions();subscribe();scr('app');initApp();
 }
 async function loadActions(){const {data,error}=await supa.from('actions').select('*').order('semaine').order('responsable').order('ordre');if(error){toast('Erreur de chargement');ACTIONS=[];return;}ACTIONS=data||[];}
-function subscribe(){supa.channel('bigee-actions').on('postgres_changes',{event:'*',schema:'public',table:'actions'},async ()=>{await loadActions();renderAll();}).subscribe();}
+function subscribe(){supa.channel('bigee-actions').on('postgres_changes',{event:'*',schema:'public',table:'actions'},async (p)=>{
+  try{var mine=myName();var nw=(p&&p.new)||{},od=(p&&p.old)||{};
+    if(p.eventType==='INSERT'&&!_myInserts[nw.id]&&(nw.responsable===mine||nw.responsable==='Couple')){pushNotif('task','Nouvelle tâche',nw.titre||'');}
+    else if(p.eventType==='UPDATE'&&(nw.responsable===mine||nw.responsable==='Couple')&&od.responsable&&od.responsable!==nw.responsable){pushNotif('task','Tâche assignée',nw.titre||'');}
+  }catch(e){}
+  await loadActions();renderAll();}).subscribe();}
 
 function doneOf(r){return ACTIONS.filter(a=>a.responsable===r&&a.statut==='fait').length;}
 function totOf(r){return ACTIONS.filter(a=>a.responsable===r).length;}
 async function persist(id,patch){const a=ACTIONS.find(x=>x.id===id);if(a)Object.assign(a,patch);renderAll();if(DEMO)return;let r=await supa.from('actions').update(patch).eq('id',id);if(r.error){const p2=Object.assign({},patch);delete p2.date_prevue;delete p2.rappels;const r2=await supa.from('actions').update(p2).eq('id',id);if(r2.error){toast('Sauvegarde impossible : '+r2.error.message);}else{toast('Enregistré (lance add_date.sql + add_rappels.sql pour date & rappels)');}}}
 async function notifyAssign(id){if(DEMO||!supa||!id)return;try{await supa.functions.invoke('notify',{body:{action_id:id}});}catch(e){}}
 function myName(){return (USER&&USER.user_metadata&&USER.user_metadata.prenom)||'Diana';}
-async function loadMsgs(){if(DEMO){MSGS=[];renderChat();return;}const {data,error}=await supa.from('messages').select('*').order('created_at',{ascending:true}).limit(300);if(!error)MSGS=data||[];renderChat();}
+async function loadMsgs(){if(DEMO){MSGS=[];renderChat();return;}const {data,error}=await supa.from('messages').select('*').order('created_at',{ascending:true}).limit(300);if(!error)MSGS=data||[];renderChat();renderBadges();}
 function subscribeMsgs(){if(DEMO||!supa)return;supa.channel('bigee-messages').on('postgres_changes',{event:'*',schema:'public',table:'messages'},function(p){
-  if(p.eventType==='INSERT'){var m=p.new;if(!MSGS.find(function(x){return x.id===m.id;})){MSGS.push(m);renderChat();var onmsg=document.getElementById('p-messages').classList.contains('on');if(m.auteur!==myName()){if(onmsg)markRead();else toast('💬 '+m.auteur+' : '+((m.texte||'pièce jointe')).slice(0,28));}}}
-  else{loadMsgs();}
+  if(p.eventType==='INSERT'){var m=p.new;if(!MSGS.find(function(x){return x.id===m.id;})){MSGS.push(m);renderChat();var onmsg=document.getElementById('p-messages').classList.contains('on');if(m.auteur!==myName()){var prev=m.texte||(m.kind==='image'?'📷 Photo':m.kind==='audio'?'🎤 Message vocal':m.kind==='file'?'📎 Fichier':'Message');pushNotif('message',m.auteur,prev);if(onmsg)markRead();else toast('💬 '+m.auteur+' : '+prev.slice(0,28));}renderBadges();}}
+  else{loadMsgs();renderBadges();}
 }).subscribe();}
 function renderChat(){var el=document.getElementById('chatList');if(!el)return;el.innerHTML=MSGS.length?MSGS.map(function(m){var me=m.auteur===myName();var t=m.created_at?new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';var quote=m.reply_txt?'<div class="quote"><b>'+esc(m.reply_auteur||'')+'</b>'+esc((m.reply_txt||'').slice(0,90))+'</div>':'';var meta=(me?'':esc(m.auteur)+' · ')+t+(m.edited?' · modifié':'')+(me?(m.lu?' · Lu':' · Envoyé'):'');return '<div class="bubble '+(me?'me':'them')+'" data-id="'+m.id+'">'+quote+msgBody(m)+'<div class="meta">'+meta+'</div></div>';}).join(''):'<div class="empty">Aucun message pour l’instant. Dites-vous bonjour 👋</div>';var p=document.getElementById('p-messages');if(p&&p.classList.contains('on')){var b=document.querySelector('.body');if(b)setTimeout(function(){b.scrollTop=b.scrollHeight;},40);}}
 var REPLYTO=null;
 function replyGo(){var m=MSGS.find(function(x){return x.id===CURMSG;});document.getElementById('msgSheet').classList.add('hide');if(!m)return;var txt=m.texte||(m.kind==='image'?'Photo':m.kind==='audio'?'Message vocal':m.kind==='file'?'Fichier':'');REPLYTO={txt:txt,auteur:m.auteur};document.getElementById('replyTxt').innerHTML='<b>'+esc(REPLYTO.auteur)+'</b> '+esc(txt.slice(0,60));document.getElementById('replyBar').classList.remove('hide');var ci=document.getElementById('chatInput');if(ci)ci.focus();}
 function cancelReply(){REPLYTO=null;var rb=document.getElementById('replyBar');if(rb)rb.classList.add('hide');}
 async function insertMsg(row){var r=await supa.from('messages').insert(row).select();if(r.error){var base={auteur:row.auteur,texte:row.texte,kind:row.kind,url:row.url,fname:row.fname};r=await supa.from('messages').insert(base).select();}return r;}
-async function markRead(){if(DEMO||!supa)return;try{await supa.from('messages').update({lu:true}).neq('auteur',myName()).eq('lu',false);}catch(e){}}
+async function markRead(){var chg=false;MSGS.forEach(function(m){if(m.auteur!==myName()&&!m.lu){m.lu=true;chg=true;}});if(chg)renderChat();renderBadges();if(DEMO||!supa)return;try{await supa.from('messages').update({lu:true}).neq('auteur',myName()).eq('lu',false);}catch(e){}}
 async function sendMsg(){var inp=document.getElementById('chatInput');var txt=inp.value.trim();if(!txt)return;inp.value='';var row={auteur:myName(),texte:txt,kind:'text'};if(REPLYTO){row.reply_txt=REPLYTO.txt;row.reply_auteur=REPLYTO.auteur;}cancelReply();if(DEMO){row.id='m'+Math.random();row.created_at=new Date().toISOString();MSGS.push(row);renderChat();return;}var res=await insertMsg(row);if(res.error){toast('Envoi impossible');inp.value=txt;return;}if(res.data&&res.data[0]&&!MSGS.find(function(x){return x.id===res.data[0].id;})){MSGS.push(res.data[0]);renderChat();}notifyMsg(txt);}
 async function notifyMsg(txt){if(DEMO||!supa)return;try{await supa.functions.invoke('notify',{body:{message:txt,from:myName()}});}catch(e){}}
 var CURMSG=null;
@@ -643,7 +693,34 @@ async function uploadFile(file,fallbackName){
 function pickFile(){document.getElementById('fileInput').click();}
 async function onFilePicked(e){var f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;toast('Envoi…');var up=await uploadFile(f);if(!up)return;var kind=(f.type||'').indexOf('image/')===0?'image':'file';await sendMediaMsg(kind,up.url,up.name);}
 async function sendMediaMsg(kind,url,fname){var row={auteur:myName(),texte:'',kind:kind,url:url,fname:fname||null};if(REPLYTO){row.reply_txt=REPLYTO.txt;row.reply_auteur=REPLYTO.auteur;}cancelReply();if(DEMO){row.id='m'+Math.random();row.created_at=new Date().toISOString();MSGS.push(row);renderChat();return;}var res=await insertMsg(row);if(res.error){toast('Envoi impossible : '+res.error.message);return;}if(res.data&&res.data[0]&&!MSGS.find(function(x){return x.id===res.data[0].id;})){MSGS.push(res.data[0]);renderChat();}notifyMsg(kind==='image'?'Photo':(kind==='audio'?'Message vocal':'Fichier'));}
-function msgBody(m){if(m.kind==='image')return '<a href="'+m.url+'" target="_blank" onclick="event.stopPropagation()"><img class="msg-img" src="'+m.url+'"></a>';if(m.kind==='audio')return '<audio class="msg-audio" controls src="'+m.url+'" onclick="event.stopPropagation()"></audio>';if(m.kind==='file')return '<a class="msg-file" href="'+m.url+'" target="_blank" onclick="event.stopPropagation()"><span class="ic">description</span>'+esc(m.fname||'Fichier')+'</a>';return esc(m.texte);}
+function msgBody(m){if(m.kind==='image')return '<a href="'+m.url+'" target="_blank" onclick="event.stopPropagation()"><img class="msg-img" src="'+m.url+'"></a>';if(m.kind==='audio')return audioHTML(m);if(m.kind==='file')return '<a class="msg-file" href="'+m.url+'" target="_blank" onclick="event.stopPropagation()"><span class="ic">description</span>'+esc(m.fname||'Fichier')+'</a>';return esc(m.texte);}
+function hashStr(s){var h=5381;s=s||'';for(var i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))>>>0;}return h;}
+function waveBars(seed){var s=seed||1,h='';for(var i=0;i<32;i++){s=(s*1103515245+12345)>>>0;var v=22+(s%78);h+='<i style="height:'+v+'%"></i>';}return h;}
+function audioHTML(m){var seed=hashStr(m.url||('a'+m.id));return '<div class="apl" onclick="event.stopPropagation()"><button class="apl-btn" onclick="aplToggle(this)"><span class="ic">play_arrow</span></button><div class="apl-wave" onclick="aplSeek(event,this)">'+waveBars(seed)+'</div><span class="apl-time">0:00</span><audio preload="metadata" src="'+m.url+'"></audio></div>';}
+function fmtDur(s){s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function aplSetProg(apl,p){var bars=apl.querySelectorAll('.apl-wave i');var upto=Math.round(p*bars.length);for(var i=0;i<bars.length;i++){if(i<upto)bars[i].classList.add('on');else bars[i].classList.remove('on');}}
+function aplProg(apl,au){var p=au.duration&&isFinite(au.duration)?au.currentTime/au.duration:0;aplSetProg(apl,p);var t=apl.querySelector('.apl-time');if(t)t.textContent=fmtDur(au.currentTime);}
+function aplToggle(btn){var apl=btn.closest('.apl');var au=apl.querySelector('audio');var ic=btn.querySelector('.ic');
+  if(au.paused){document.querySelectorAll('.apl audio').forEach(function(a){if(a!==au){a.pause();}});document.querySelectorAll('.apl-btn .ic').forEach(function(x){if(x!==ic)x.textContent='play_arrow';});
+    if(!au._bound){au._bound=true;
+      au.addEventListener('timeupdate',function(){aplProg(apl,au);});
+      au.addEventListener('ended',function(){ic.textContent='play_arrow';aplSetProg(apl,0);var t=apl.querySelector('.apl-time');if(t)t.textContent=fmtDur(au.duration);});
+      au.addEventListener('loadedmetadata',function(){var t=apl.querySelector('.apl-time');if(t&&au.paused&&isFinite(au.duration))t.textContent=fmtDur(au.duration);});
+    }
+    var pr=au.play();if(pr&&pr.catch)pr.catch(function(){});ic.textContent='pause';
+  }else{au.pause();ic.textContent='play_arrow';}
+}
+function aplSeek(e,wave){var apl=wave.closest('.apl');var au=apl.querySelector('audio');var r=wave.getBoundingClientRect();var p=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));if(au.duration&&isFinite(au.duration)){au.currentTime=p*au.duration;aplProg(apl,au);}}
+// ---- Notifications ----
+function pushNotif(type,title,body){var n={id:'n'+Date.now()+Math.random().toString(36).slice(2,6),type:type,title:title,body:body||'',time:Date.now(),read:false};NOTIFS.push(n);saveNotifs();renderBadges();}
+function unreadNotifs(){return NOTIFS.filter(function(n){return !n.read;}).length;}
+function unreadMsgs(){return MSGS.filter(function(m){return m.auteur!==myName()&&!m.lu;}).length;}
+function renderBadges(){var nb=document.getElementById('notifBadge');if(nb){var c=unreadNotifs();nb.textContent=c>9?'9+':c;nb.classList.toggle('on',c>0);}var mb=document.getElementById('msgBadge');if(mb){var u=unreadMsgs();mb.textContent=u>9?'9+':u;mb.classList.toggle('on',u>0);}}
+function timeAgo(ts){var d=Math.floor((Date.now()-ts)/1000);if(d<60)return "à l'instant";if(d<3600)return Math.floor(d/60)+' min';if(d<86400)return Math.floor(d/3600)+' h';return Math.floor(d/86400)+' j';}
+function renderNotifs(){var el=document.getElementById('notifList');if(!el)return;if(!NOTIFS.length){el.innerHTML='<div class="empty">Aucune notification.</div>';return;}el.innerHTML=NOTIFS.slice().reverse().map(function(n){var ico=n.type==='message'?'chat':(n.type==='task'?'task_alt':'notifications');return '<div class="notif'+(n.read?'':' unread')+'"><span class="nic"><span class="ic">'+ico+'</span></span><div class="nbody"><div class="ntitle"><span>'+esc(n.title)+'</span><span class="ntime">'+timeAgo(n.time)+'</span></div><div class="ntext">'+esc(n.body)+'</div></div></div>';}).join('');}
+function openNotifs(){renderNotifs();document.getElementById('notifSheet').classList.remove('hide');NOTIFS.forEach(function(n){n.read=true;});saveNotifs();setTimeout(renderBadges,50);}
+function closeNotif(e){if(e&&e.target&&e.target.id!=='notifSheet'&&!(e.target.classList&&e.target.classList.contains('cancel')))return;document.getElementById('notifSheet').classList.add('hide');}
+function markAllNotifs(){NOTIFS.forEach(function(n){n.read=true;});saveNotifs();renderNotifs();renderBadges();}
 var mediaRec=null,recChunks=[];
 var recStream=null,recAnalyser=null,recRAF=null,recSecs=0,recTimerId=null,recCancelled=false,recCtx=null;
 function buildWave(){var w=document.getElementById('recWave');var h='';for(var i=0;i<28;i++)h+='<i></i>';w.innerHTML=h;}
@@ -693,9 +770,10 @@ function initApp(){
   document.querySelectorAll('#filtStatAp button').forEach(b=>b.onclick=()=>{APS=b.dataset.s;document.querySelectorAll('#filtStatAp button').forEach(x=>x.classList.toggle('act',x===b));renderApercu();});
   const prenom=(USER.user_metadata&&USER.user_metadata.prenom)||'Diana';
   document.getElementById('gHello').textContent=helloWord()+' '+prenom;
-  renderAll();history.replaceState({pane:'accueil'},'');show('accueil');refreshPush();loadMsgs();subscribeMsgs();bindChatLongPress();initPresence();
+  loadNotifs();pickQuote();
+  renderAll();history.replaceState({pane:'accueil'},'');show('accueil');refreshPush();loadMsgs();subscribeMsgs();bindChatLongPress();initPresence();renderBadges();
 }
-function show(p){document.querySelectorAll('.pane').forEach(e=>e.classList.remove('on'));document.getElementById('p-'+p).classList.add('on');document.querySelectorAll('.nav button[data-p]').forEach(b=>b.classList.toggle('act',b.dataset.p===p));document.querySelector('.body').scrollTop=0;if(p!=='detail')CURPANE=p;if(p==='messages'){renderChat();markRead();}}
+function show(p){document.querySelectorAll('.pane').forEach(e=>e.classList.remove('on'));document.getElementById('p-'+p).classList.add('on');document.querySelectorAll('.nav button[data-p]').forEach(b=>b.classList.toggle('act',b.dataset.p===p));document.querySelector('.body').scrollTop=0;if(p!=='detail')CURPANE=p;if(p==='messages'){renderChat();markRead();}if(p==='focus')pickQuote();}
 function navTo(p){history.pushState({pane:p},'');show(p);}
 function back(){history.back();}
 window.addEventListener('popstate',function(ev){const p=(ev.state&&ev.state.pane)||'accueil';show(p);});
@@ -773,7 +851,7 @@ function renderFocus(){
   el.innerHTML=rows.length?rows.map(taskHTML).join(''):'<div class="empty">Aucune action cette semaine.</div>';
 }
 function openDetail(id){CUR=ACTIONS.find(a=>a.id===id);var ec=document.getElementById('editCard');if(ec)ec.style.display='none';renderDetail();navTo('detail');}
-async function addTask(){const titre=prompt('Nouvelle action pour '+SEGR+' (semaine '+CURW+') :');if(!titre||!titre.trim())return;const ordre=ACTIONS.filter(a=>a.semaine===CURW&&a.responsable===SEGR).length+1;const row={responsable:SEGR,mois:MONTH(CURW),semaine:CURW,ordre:ordre,titre:titre.trim(),priorite:'P2',duree:'',categorie:'',statut:'a_faire'};if(DEMO){row.id='n'+Math.random();ACTIONS.push(row);renderAll();openDetail(row.id);openEdit();return;}const {data,error}=await supa.from('actions').insert(row).select();if(error){toast('Ajout impossible');return;}if(data&&data[0]){ACTIONS.push(data[0]);notifyAssign(data[0].id);renderAll();openDetail(data[0].id);openEdit();toast('Précise la semaine, la date et l’heure');return;}renderAll();}
+async function addTask(){const titre=prompt('Nouvelle action pour '+SEGR+' (semaine '+CURW+') :');if(!titre||!titre.trim())return;const ordre=ACTIONS.filter(a=>a.semaine===CURW&&a.responsable===SEGR).length+1;const row={responsable:SEGR,mois:MONTH(CURW),semaine:CURW,ordre:ordre,titre:titre.trim(),priorite:'P2',duree:'',categorie:'',statut:'a_faire'};if(DEMO){row.id='n'+Math.random();ACTIONS.push(row);renderAll();openDetail(row.id);openEdit();return;}const {data,error}=await supa.from('actions').insert(row).select();if(error){toast('Ajout impossible');return;}if(data&&data[0]){_myInserts[data[0].id]=1;ACTIONS.push(data[0]);notifyAssign(data[0].id);renderAll();openDetail(data[0].id);openEdit();toast('Précise la semaine, la date et l’heure');return;}renderAll();}
 function openEdit(){const c=document.getElementById('editCard');document.getElementById('eTitre').value=CUR.titre||'';document.getElementById('eResp').value=CUR.responsable||'Diana';document.getElementById('eSem').value=CUR.semaine||1;document.getElementById('eDate').value=CUR.date_prevue||'';document.getElementById('eHeure').value=CUR.heure_prevue||'';document.getElementById('eRappels').value=CUR.rappels||'15,5,0';document.getElementById('eDuree').value=CUR.duree||'';document.getElementById('ePrio').value=CUR.priorite||'P2';document.getElementById('eCat').value=CUR.categorie||'';c.style.display='block';}
 function toggleEdit(){const c=document.getElementById('editCard');if(c.style.display==='none'){openEdit();}else{c.style.display='none';}}
 async function saveEdit(){const newResp=document.getElementById('eResp').value;const newSem=Number(document.getElementById('eSem').value)||CUR.semaine||1;const changed=newResp!==CUR.responsable;const patch={titre:(document.getElementById('eTitre').value.trim()||CUR.titre),responsable:newResp,semaine:newSem,mois:MONTH(newSem),date_prevue:document.getElementById('eDate').value||null,heure_prevue:document.getElementById('eHeure').value||null,rappels:(document.getElementById('eRappels').value.trim()||'15,5,0'),duree:document.getElementById('eDuree').value.trim(),priorite:document.getElementById('ePrio').value,categorie:document.getElementById('eCat').value.trim()};await persist(CUR.id,patch);document.getElementById('editCard').style.display='none';renderDetail();if(changed){notifyAssign(CUR.id);toast('Assignée à '+newResp);}else{toast('Action enregistrée');}}
@@ -830,7 +908,25 @@ let secs=1500,tid=null;
 function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
 function tick(){if(secs>0){secs--;document.getElementById('clock').textContent=fmt(secs);}else{clearInterval(tid);tid=null;}}
 function toggleTimer(){const b=document.getElementById('startBtn');if(tid){clearInterval(tid);tid=null;b.querySelector('span').textContent='Reprendre';}else{tid=setInterval(tick,1000);b.querySelector('span').textContent='Pause';}}
-function resetTimer(){clearInterval(tid);tid=null;secs=1500;document.getElementById('clock').textContent='25:00';document.getElementById('startBtn').querySelector('span').textContent='Démarrer';}
+function resetTimer(){}
+var QUOTES=[
+ {fr:"Un petit pas chaque jour mène à de grands résultats.",en:"A small step each day leads to big results.",a:""},
+ {fr:"La discipline est le pont entre les objectifs et les accomplissements.",en:"Discipline is the bridge between goals and accomplishment.",a:"Jim Rohn"},
+ {fr:"Le succès, c'est la somme de petits efforts répétés jour après jour.",en:"Success is the sum of small efforts repeated day after day.",a:"Robert Collier"},
+ {fr:"Ne comptez pas les jours, faites que les jours comptent.",en:"Don't count the days, make the days count.",a:"Mohamed Ali"},
+ {fr:"Le meilleur moment pour commencer, c'était hier. Le deuxième, c'est maintenant.",en:"The best time to start was yesterday. The next best is now.",a:""},
+ {fr:"Tu n'as pas à être parfait, tu dois juste avancer.",en:"You don't have to be perfect, you just have to keep going.",a:""},
+ {fr:"Les grandes choses ne sont jamais faites seul.",en:"Great things are never done alone.",a:""},
+ {fr:"La motivation te lance, l'habitude te fait continuer.",en:"Motivation gets you started, habit keeps you going.",a:"Jim Ryun"},
+ {fr:"Fais aujourd'hui ce que les autres ne veulent pas, tu vivras demain comme les autres ne peuvent pas.",en:"Do today what others won't, live tomorrow like others can't.",a:""},
+ {fr:"Chaque expert a d'abord été un débutant.",en:"Every expert was once a beginner.",a:""},
+ {fr:"Un rêve écrit avec une date devient un objectif.",en:"A dream written down with a date becomes a goal.",a:""},
+ {fr:"La constance bat le talent quand le talent n'est pas constant.",en:"Consistency beats talent when talent isn't consistent.",a:""},
+ {fr:"Ce n'est pas la charge qui te brise, mais la façon dont tu la portes.",en:"It's not the load that breaks you, it's how you carry it.",a:"Lena Horne"},
+ {fr:"Avance à deux : ensemble, on va plus loin.",en:"Move together: together we go further.",a:""}
+];
+var _lastQ=-1;
+function pickQuote(){var t=document.getElementById('quoteText'),a=document.getElementById('quoteAuth');if(!t)return;var i=Math.floor(Math.random()*QUOTES.length);if(QUOTES.length>1&&i===_lastQ)i=(i+1)%QUOTES.length;_lastQ=i;var q=QUOTES[i];t.textContent=(LANG==='en'?q.en:q.fr);if(a)a.textContent=q.a?('— '+q.a):'';}
 
 function demoData(){
   const mk=(r,sem,ord,titre,prio,dur,cat,dod,subs,statut,mois)=>({id:r+sem+ord+Math.random(),responsable:r,semaine:sem,mois:mois||MONTH(sem),ordre:ord,titre:titre,priorite:prio,duree:dur,categorie:cat,dod:dod,sous_etapes:subs,statut:statut,heure_prevue:null});
