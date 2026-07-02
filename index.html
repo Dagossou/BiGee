@@ -80,6 +80,28 @@ input.tf:focus{outline:none;border-color:var(--green)}
 .greet{padding:4px 2px 18px}
 .greet h2{margin:0;font-size:23px;font-weight:800;letter-spacing:-.6px}
 .greet p{margin:5px 0 0;color:var(--muted);font-size:13px;font-weight:500;text-transform:capitalize}
+.hero2{background:linear-gradient(150deg,var(--nuit),#0d2a1c);color:var(--papier);border-radius:22px;padding:20px;margin-bottom:16px;box-shadow:0 16px 34px -18px rgba(0,0,0,.5)}
+.hero2-top{display:flex;justify-content:space-between;align-items:flex-start}
+.hero2-pct{font-size:44px;font-weight:900;letter-spacing:-1.5px;line-height:1;color:var(--green)}
+.hero2-lab{font-size:12px;opacity:.72;margin-top:7px;font-weight:600}
+.hero2-badge{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:var(--green);flex:none}
+.hero2-badge .ic{font-size:24px;font-variation-settings:'FILL' 1}
+.hero2-bar{height:8px;border-radius:6px;background:rgba(255,255,255,.14);margin:16px 0;overflow:hidden}
+.hero2-bar i{display:block;height:100%;border-radius:6px;background:var(--green);transition:width .6s}
+.hero2-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.h2s{background:rgba(255,255,255,.07);border-radius:14px;padding:11px 8px;text-align:center}
+.h2s .v{display:block;font-size:19px;font-weight:800;letter-spacing:-.3px}
+.h2s .l{display:block;font-size:9px;opacity:.62;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.ppl{display:flex;flex-direction:column;gap:15px}
+.ppl-row{display:flex;align-items:center;gap:12px}
+.ppl-dot{width:11px;height:11px;border-radius:50%;flex:none}
+.ppl-mid{flex:1;min-width:0}
+.ppl-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.ppl-nm{font-size:13px;font-weight:800}
+.ppl-fr{font-size:11px;color:var(--muted);font-weight:600}
+.ppl-bar{height:8px;border-radius:6px;background:var(--chip);overflow:hidden}
+.ppl-bar i{display:block;height:100%;border-radius:6px;transition:width .6s}
+.ppl-pct{font-size:15px;font-weight:800;min-width:40px;text-align:right}
 .hero{background:var(--nuit);color:var(--papier);border-radius:22px;padding:20px;display:flex;align-items:center;gap:18px;margin-bottom:16px}
 .hero-ring{width:106px;height:106px;border-radius:50%;flex:none;background:conic-gradient(var(--green) calc(var(--p,0)*1%),rgba(255,255,255,.12) 0);display:flex;align-items:center;justify-content:center}
 .hero-ring-in{width:84px;height:84px;border-radius:50%;background:var(--nuit);display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -408,18 +430,22 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
       <div class="pane on" id="p-accueil">
         <div class="greet"><h2 id="gHello">Bonjour</h2><p id="gDate"></p><span class="streak-chip" id="streakChip" style="display:none"></span></div>
 
-        <div class="hero">
-          <div class="hero-ring" id="heroRing" style="--p:0"><div class="hero-ring-in"><b id="heroPct">0%</b><small id="heroFrac">0 / 216</small></div></div>
-          <div class="hero-stats">
-            <div class="hstat"><span class="hs-lab">Cette semaine</span><span class="hs-val" id="hsWeek">0 / 0</span></div>
-            <div class="hstat"><span class="hs-lab">En cours</span><span class="hs-val" id="hsProg">0</span></div>
-            <div class="hstat"><span class="hs-lab">Semaine</span><span class="hs-val" id="hsNo">1</span></div>
+        <div class="hero2">
+          <div class="hero2-top">
+            <div><div class="hero2-pct" id="heroPct">0%</div><div class="hero2-lab">Progression globale · <span id="heroFrac">0 / 216</span></div></div>
+            <div class="hero2-badge"><span class="ic">emoji_events</span></div>
+          </div>
+          <div class="hero2-bar"><i id="heroBar" style="width:0%"></i></div>
+          <div class="hero2-stats">
+            <div class="h2s"><span class="v" id="hsWeek">0/0</span><span class="l">Cette semaine</span></div>
+            <div class="h2s"><span class="v" id="hsProg">0</span><span class="l">En cours</span></div>
+            <div class="h2s"><span class="v" id="hsNo">1</span><span class="l">Semaine</span></div>
           </div>
         </div>
 
         <div class="card">
           <h3>Par personne</h3>
-          <div class="trio" id="trio"></div>
+          <div class="ppl" id="trio"></div>
         </div>
 
         <div class="card">
@@ -820,14 +846,14 @@ function renderAccueil(){
   const totDone=doneOf('Diana')+doneOf('Daniel')+doneOf('Couple');
   const totAll=ACTIONS.length||0;
   const g=totAll?Math.round(totDone/totAll*100):0;
-  document.getElementById('heroRing').style.setProperty('--p',g);
+  document.getElementById('heroBar').style.width=g+'%';
   document.getElementById('heroPct').textContent=g+'%';
   document.getElementById('heroFrac').textContent=totDone+' / '+totAll;
   const wk=ACTIONS.filter(a=>a.semaine===CURW);
   document.getElementById('hsWeek').textContent=wk.filter(a=>a.statut==='fait').length+' / '+wk.length;
   document.getElementById('hsProg').textContent=ACTIONS.filter(a=>a.statut==='en_cours').length;
   document.getElementById('hsNo').textContent=CURW;
-  document.getElementById('trio').innerHTML=RESP.map(function(r){var dn=doneOf(r),t=totOf(r)||1,p=Math.round(dn/t*100);return '<div class="mring"><div class="r" style="--p:'+p+';--c:'+COLS[r]+'"><b>'+p+'%</b></div><div class="nm" style="color:'+COLS[r]+'">'+r+'</div><div class="fr">'+dn+' / '+totOf(r)+'</div></div>';}).join('');
+  document.getElementById('trio').innerHTML=RESP.map(function(r){var dn=doneOf(r),tt=totOf(r),t=tt||1,p=Math.round(dn/t*100);return '<div class="ppl-row"><span class="ppl-dot" style="background:'+COLS[r]+'"></span><div class="ppl-mid"><div class="ppl-top"><span class="ppl-nm">'+r+'</span><span class="ppl-fr">'+dn+' / '+tt+'</span></div><div class="ppl-bar"><i style="width:'+p+'%;background:'+COLS[r]+'"></i></div></div><span class="ppl-pct" style="color:'+COLS[r]+'">'+p+'%</span></div>';}).join('');
   var mb='';for(var m=1;m<=6;m++){var cell=ACTIONS.filter(function(a){return a.mois===m;});var t=cell.length,dn=cell.filter(function(a){return a.statut==='fait';}).length;var p=t?Math.round(dn/t*100):0;mb+='<div class="col"><div class="barwrap"><div class="bar" style="height:'+Math.max(p,2)+'%"></div></div><small>M'+m+'</small></div>';}
   document.getElementById('mbars').innerHTML=mb;
 }
