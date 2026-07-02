@@ -249,13 +249,13 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 .bubble.me .apl-wave{color:var(--green-ink)}
 .bubble.them .apl-wave{color:var(--green-tx)}
 .apl-time{font-size:10.5px;font-variant-numeric:tabular-nums;opacity:.7;min-width:28px;text-align:right}
-.qcard{position:relative;overflow:hidden;border-radius:22px;padding:30px 22px 28px;background:radial-gradient(135% 85% at 100% 0,#0f5236,#083425 62%);box-shadow:0 16px 34px -18px rgba(0,0,0,.5);cursor:pointer;text-align:center}
+.qcard{position:relative;overflow:hidden;border-radius:22px;padding:20px;height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(135% 85% at 100% 0,#0f5236,#083425 62%);box-shadow:0 16px 34px -18px rgba(0,0,0,.5);cursor:pointer;text-align:center}
 .qcard::before{content:"";position:absolute;top:-42px;right:-32px;width:130px;height:130px;border-radius:50%;border:16px solid rgba(150,230,170,.09)}
 .qcard::after{content:"";position:absolute;bottom:-54px;left:-44px;width:160px;height:160px;border-radius:50%;border:16px solid rgba(150,230,170,.07)}
-.qcmark{position:relative;display:block;color:var(--green);font-family:Georgia,'Times New Roman',serif;font-weight:800;font-size:88px;line-height:.7;height:50px;margin-bottom:16px}
-.qctext{position:relative;margin:0;color:#f2faf4;font-size:34px;font-weight:500;line-height:1.28;letter-spacing:-.4px}
+.qcmark{position:relative;display:block;color:var(--green);font-family:Georgia,'Times New Roman',serif;font-weight:800;font-size:60px;line-height:.6;height:30px;margin-bottom:10px}
+.qctext{position:relative;margin:0;color:#f2faf4;font-size:21px;font-weight:500;line-height:1.32;letter-spacing:-.3px}
 .qctext b{color:var(--green);font-weight:800}
-.qcauth{position:relative;display:block;margin-top:20px;color:var(--green);font-weight:700;font-size:24px}
+.qcauth{position:relative;display:block;margin-top:16px;color:var(--green);font-weight:700;font-size:14px}
 .badge{position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--coral,#ff5a5f);color:#fff;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 2px var(--card)}
 .badge.on{display:flex}
 .ico-btn{position:relative}
@@ -425,8 +425,8 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
       <div class="pane" id="p-focus">
         <div class="qcard" onclick="pickQuote()">
           <span class="qcmark">“</span>
-          <p class="qctext" id="quoteText" style="font-size:34px">…</p>
-          <span class="qcauth" id="quoteAuth" style="font-size:22px"></span>
+          <p class="qctext" id="quoteText" style="font-size:21px">…</p>
+          <span class="qcauth" id="quoteAuth" style="font-size:14px"></span>
         </div>
         <div class="seg" id="segFocus" style="margin-top:16px"><button class="act" data-r="Diana">Diana</button><button data-r="Daniel">Daniel</button></div>
         <div class="section-title">Tâches du jour</div>
