@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400..700,0..1,-25..0&display=block" rel="stylesheet">
 <style>
 :root{
   --green:#3CDE4B; --green-ink:#0A2110;
@@ -37,6 +38,14 @@
 html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--ink);overflow:hidden}
 svg.i{width:23px;height:23px;fill:currentColor;stroke:none;display:block}
+.ic{font-family:'Material Symbols Rounded';font-weight:400;font-style:normal;font-size:23px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased;font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24}
+.nav button .ic{font-size:27px}
+.ico-btn .ic{font-size:23px}
+.brand .logo .ic{font-size:21px}
+.chk .ic{font-size:17px;opacity:0;color:var(--green-ink)}
+.task.done .chk .ic{opacity:1}
+.tbtn button .ic{font-size:18px}
+.chat-send .ic{font-size:22px}
 .app{height:100dvh;max-width:520px;margin:0 auto;display:flex;flex-direction:column;position:relative;background:var(--bg)}
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:26px;z-index:20;background:var(--bg);overflow-y:auto}
 .screen.hide{display:none !important}
@@ -65,7 +74,7 @@ input.tf:focus{outline:none;border-color:var(--green)}
 .brand .logo{width:30px;height:30px;border-radius:10px;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center}
 .ico-btn{width:40px;height:40px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink);cursor:pointer}
 .grp{display:flex;gap:8px}
-.body{flex:1;overflow-y:auto;padding:10px 18px 104px}
+.body{flex:1;overflow-y:auto;padding:10px 18px 120px}
 .pane{display:none}.pane.on{display:block}
 .who{font-size:11px;color:var(--muted);font-weight:600;padding:0 2px 8px}.who b{color:var(--green-tx)}
 .greet{padding:4px 2px 18px}
@@ -209,18 +218,17 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 .results{list-style:none;margin:6px 0 0;padding:0}
 .results li{display:flex;align-items:center;gap:9px;font-size:12.5px;padding:9px 0;border-top:1px solid var(--line);font-weight:600}.results li:first-child{border-top:none}
 .results .rc{width:22px;height:22px;border-radius:7px;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center;flex:none}.results .rc svg{width:13px;height:13px;stroke-width:3}
-.nav{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;padding:8px 0 calc(env(safe-area-inset-bottom) + 8px)}
-.nav button{border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:9.5px;font-weight:700;cursor:pointer}
-.nav button svg{width:26px;height:26px}.nav button.act{color:var(--green-tx)}
-.nav .fab{margin-top:-24px}.nav .fab .fabic{width:56px;height:56px;border-radius:18px;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center}
-.nav .fab .fabic svg{width:30px;height:30px}
+.nav{position:absolute;left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom) + 14px);background:var(--card);border:1px solid var(--line);border-radius:26px;display:flex;justify-content:space-around;align-items:center;padding:7px 6px;box-shadow:0 14px 34px -12px rgba(10,30,20,.4)}
+.nav button{border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;padding:6px 12px;border-radius:16px;transition:background .2s,color .2s}
+.nav button svg{width:23px;height:23px}
+.nav button.act{color:var(--green-tx);background:var(--green-bg)}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--nuit);color:var(--papier);padding:10px 16px;border-radius:12px;font-size:12px;font-weight:700;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:88%;text-align:center}.toast.show{opacity:1}
-.chat-list{display:flex;flex-direction:column;gap:8px;padding-bottom:78px}
+.chat-list{display:flex;flex-direction:column;gap:8px;padding-bottom:120px}
 .bubble{max-width:80%;padding:9px 12px;border-radius:16px;font-size:13px;line-height:1.4;word-wrap:break-word}
 .bubble .meta{font-size:9.5px;opacity:.65;margin-top:3px}
 .bubble.me{align-self:flex-end;background:var(--green);color:var(--green-ink);border-bottom-right-radius:5px}
 .bubble.them{align-self:flex-start;background:var(--card);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:5px}
-.composer{position:fixed;left:0;right:0;bottom:calc(74px + env(safe-area-inset-bottom));max-width:520px;margin:0 auto;display:flex;gap:8px;padding:8px 12px;background:var(--bg)}
+.composer{position:fixed;left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom) + 92px);max-width:492px;margin:0 auto;display:flex;gap:8px;padding:8px;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 10px 24px -12px rgba(10,30,20,.35)}
 .chat-send{width:44px;height:44px;border-radius:12px;border:none;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer}
 .chat-send svg{width:20px;height:20px}
 </style>
@@ -419,7 +427,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
     <div class="nav">
       <button class="act" data-p="accueil"><svg class="i"><use href="#home"/></svg>Accueil</button>
       <button data-p="semaine"><svg class="i"><use href="#list"/></svg>Semaine</button>
-      <button class="fab" data-p="focus"><span class="fabic"><svg class="i"><use href="#bolt"/></svg></span></button>
+      <button data-p="focus"><svg class="i"><use href="#bolt"/></svg>Focus</button>
       <button data-p="revue"><svg class="i"><use href="#calendar"/></svg>Revue</button>
       <button data-p="messages"><svg class="i"><use href="#chat"/></svg>Messages</button>
     </div>
@@ -468,6 +476,11 @@ function parseOffs(s){return (s==null||s===''?'15,5,0':String(s)).split(',').map
 function setRap(v){var e=document.getElementById('eRappels');if(e)e.value=v;}
 function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 function helloWord(){const h=new Date().getHours();return (h>=18||h<6)?'Bonsoir':'Bonjour';}
+var ICMAP={bell:'notifications',edit:'edit',home:'home',list:'checklist',bolt:'bolt',calendar:'calendar_month',target:'track_changes',trend:'trending_up',users:'group','arrow-ur':'arrow_outward',check:'check',chev:'chevron_right',back:'chevron_left',chevrons:'double_arrow',clock:'schedule',logout:'logout',flag:'flag',left:'chevron_left',right:'chevron_right',play:'play_arrow',refresh:'refresh',repeat:'autorenew',briefcase:'work',grid:'grid_view',plus:'add',chat:'chat',send:'send'};
+function svgToIcon(svg){try{var use=svg.querySelector('use');if(!use)return;var href=(use.getAttribute('href')||use.getAttribute('xlink:href')||'').replace('#','');var name=ICMAP[href];if(!name)return;var span=document.createElement('span');span.className='ic';span.textContent=name;var st=svg.getAttribute('style')||'';var w=st.match(/width:\s*([0-9.]+)px/);var c=st.match(/color:\s*([^;]+)/);var s2='';if(w)s2+='font-size:'+w[1]+'px;';if(c)s2+='color:'+c[1]+';';if(s2)span.setAttribute('style',s2);if(svg.parentNode)svg.parentNode.replaceChild(span,svg);}catch(e){}}
+function applyIcons(root){(root||document).querySelectorAll('svg.i').forEach(svgToIcon);}
+try{var _iconObs=new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var an=ms[i].addedNodes;for(var j=0;j<an.length;j++){var n=an[j];if(n.nodeType===1){if(n.matches&&n.matches('svg.i'))svgToIcon(n);else if(n.querySelectorAll)n.querySelectorAll('svg.i').forEach(svgToIcon);}}}});_iconObs.observe(document.body,{childList:true,subtree:true});}catch(e){}
+applyIcons();
 
 function saveConfig(){const u=document.getElementById('cfgUrl').value.trim(),k=document.getElementById('cfgKey').value.trim();if(!u||!k){document.getElementById('cfgMsg').innerHTML='<div class="msg err">Renseigne les deux champs.</div>';return;}localStorage.setItem(LS.url,u);localStorage.setItem(LS.key,k);boot();}
 function resetConfig(){localStorage.removeItem(LS.url);localStorage.removeItem(LS.key);location.reload();}
