@@ -249,10 +249,11 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 .bubble.me .apl-wave{color:var(--green-ink)}
 .bubble.them .apl-wave{color:var(--green-tx)}
 .apl-time{font-size:10.5px;font-variant-numeric:tabular-nums;opacity:.7;min-width:28px;text-align:right}
-.mquote{margin-top:14px;background:var(--green-bg);border-radius:16px;padding:15px 15px 15px 42px;position:relative;text-align:left}
-.mquote .qm{position:absolute;left:13px;top:2px;font-size:40px;line-height:1;color:var(--green-tx);opacity:.45;font-family:Georgia,'Times New Roman',serif}
-.mquote p{margin:0;font-size:14px;font-weight:600;line-height:1.5;color:var(--ink)}
-.mquote .qa{display:block;margin-top:8px;font-size:12px;font-weight:800;color:var(--green-tx)}
+.mquote{margin-top:14px;position:relative;padding:22px 20px 18px;border-radius:20px;background:linear-gradient(150deg,var(--nuit),#0e2a19);color:var(--papier);overflow:hidden;box-shadow:0 12px 26px -14px rgba(6,24,14,.6)}
+.mquote::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--green)}
+.mquote .qm{position:absolute;right:16px;top:4px;font-size:74px;line-height:1;color:var(--green);opacity:.28;font-family:Georgia,'Times New Roman',serif}
+.mquote p{margin:0;position:relative;font-size:15px;font-weight:600;line-height:1.55;font-style:italic}
+.mquote .qa{display:block;margin-top:11px;font-size:11px;font-weight:800;color:var(--green);letter-spacing:.6px;text-transform:uppercase;position:relative}
 .badge{position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--coral,#ff5a5f);color:#fff;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 2px var(--card)}
 .badge.on{display:flex}
 .ico-btn{position:relative}
@@ -412,8 +413,8 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 
       <div class="pane" id="p-focus">
         <div class="card focus-hd"><h3>Focus du jour</h3>
+          <p class="m" id="focusName" style="margin:6px 0 0;color:var(--green-tx);font-weight:800;font-size:13.5px">Tes 3 priorités — Diana</p>
           <div class="mquote"><span class="qm">“</span><p id="quoteText">…</p><span class="qa" id="quoteAuth"></span></div>
-          <p class="m" id="focusName" style="margin-top:12px">Tes 3 priorités — Diana</p>
         </div>
         <div class="seg" id="segFocus"><button class="act" data-r="Diana">Diana</button><button data-r="Daniel">Daniel</button></div>
         <div class="section-title">À faire en priorité</div>
@@ -722,18 +723,22 @@ function openNotifs(){renderNotifs();document.getElementById('notifSheet').class
 function closeNotif(e){if(e&&e.target&&e.target.id!=='notifSheet'&&!(e.target.classList&&e.target.classList.contains('cancel')))return;document.getElementById('notifSheet').classList.add('hide');}
 function markAllNotifs(){NOTIFS.forEach(function(n){n.read=true;});saveNotifs();renderNotifs();renderBadges();}
 var mediaRec=null,recChunks=[];
-var recStream=null,recAnalyser=null,recRAF=null,recSecs=0,recTimerId=null,recCancelled=false,recCtx=null;
+var recStream=null,recAnalyser=null,recRAF=null,recSecs=0,recTimerId=null,recCancelled=false,recCtx=null,recMime='';
+function pickMime(){var c=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/mpeg','audio/ogg;codecs=opus'];if(window.MediaRecorder&&MediaRecorder.isTypeSupported){for(var i=0;i<c.length;i++){try{if(MediaRecorder.isTypeSupported(c[i]))return c[i];}catch(e){}}}return '';}
+function extForMime(t){t=t||'';if(t.indexOf('mp4')>=0||t.indexOf('aac')>=0)return 'm4a';if(t.indexOf('mpeg')>=0)return 'mp3';if(t.indexOf('ogg')>=0)return 'ogg';return 'webm';}
 function buildWave(){var w=document.getElementById('recWave');var h='';for(var i=0;i<28;i++)h+='<i></i>';w.innerHTML=h;}
 function animWave(){if(!recAnalyser)return;var bars=document.querySelectorAll('#recWave i');var data=new Uint8Array(recAnalyser.frequencyBinCount);recAnalyser.getByteFrequencyData(data);for(var i=0;i<bars.length;i++){var v=(data[i%data.length]||0)/255;bars[i].style.height=Math.max(8,Math.round(v*100))+'%';}recRAF=requestAnimationFrame(animWave);}
 async function startRecord(){
   if(DEMO){toast('Indispo en démo');return;}
   if(!navigator.mediaDevices||!window.MediaRecorder){toast('Vocal non supporté ici');return;}
   try{
-    recStream=await navigator.mediaDevices.getUserMedia({audio:true});
-    mediaRec=new MediaRecorder(recStream);recChunks=[];recCancelled=false;
+    recStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    recMime=pickMime();
+    try{mediaRec=recMime?new MediaRecorder(recStream,{mimeType:recMime,audioBitsPerSecond:128000}):new MediaRecorder(recStream);}catch(e){mediaRec=new MediaRecorder(recStream);}
+    recMime=mediaRec.mimeType||recMime||'audio/webm';recChunks=[];recCancelled=false;
     mediaRec.ondataavailable=function(ev){if(ev.data&&ev.data.size)recChunks.push(ev.data);};
     mediaRec.onstop=onRecStop;
-    mediaRec.start();
+    mediaRec.start(200);
     document.querySelector('.composer').style.display='none';
     document.getElementById('recBar').classList.remove('hide');
     buildWave();recSecs=0;document.getElementById('recTime').textContent='0:00';
@@ -743,7 +748,7 @@ async function startRecord(){
   }catch(e){toast('Micro refusé');}
 }
 function stopRecInternal(){if(recTimerId){clearInterval(recTimerId);recTimerId=null;}if(recRAF){cancelAnimationFrame(recRAF);recRAF=null;}recAnalyser=null;if(recCtx){try{recCtx.close();}catch(e){}recCtx=null;}if(recStream){recStream.getTracks().forEach(function(t){t.stop();});recStream=null;}var rb=document.getElementById('recBar');if(rb)rb.classList.add('hide');var c=document.querySelector('.composer');if(c)c.style.display='';sendPresence('idle');}
-async function onRecStop(){var wasCancel=recCancelled;stopRecInternal();if(wasCancel)return;var blob=new Blob(recChunks,{type:'audio/webm'});if(!blob.size)return;var file=new File([blob],'vocal.webm',{type:'audio/webm'});toast('Envoi du vocal…');var up=await uploadFile(file,'vocal.webm');if(up)sendMediaMsg('audio',up.url,'vocal.webm');}
+async function onRecStop(){var wasCancel=recCancelled;stopRecInternal();if(wasCancel)return;var type=recMime||'audio/webm';var blob=new Blob(recChunks,{type:type});if(!blob.size){toast('Vocal vide, réessaie');return;}var ext=extForMime(type);var fname='vocal.'+ext;var file=new File([blob],fname,{type:type});toast('Envoi du vocal…');var up=await uploadFile(file,fname);if(up)sendMediaMsg('audio',up.url,fname);}
 function stopAndSend(){if(mediaRec&&mediaRec.state==='recording'){recCancelled=false;mediaRec.stop();}}
 function cancelRecord(){if(mediaRec&&mediaRec.state==='recording'){recCancelled=true;mediaRec.stop();}else{stopRecInternal();}}
 var presCh=null,_typeTimer=null,_presTimer=null;
