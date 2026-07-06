@@ -279,6 +279,9 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 .qctext b{color:var(--green-tx);font-weight:800}
 .qcauth{position:relative;display:block;margin-top:16px;color:var(--green-tx);font-weight:700;font-size:14px}
 .streak-chip{display:inline-flex;align-items:center;gap:5px;margin-top:10px;background:var(--green-bg);color:var(--green-tx);font-weight:800;font-size:12px;padding:5px 11px;border-radius:20px;text-transform:none}
+.notif-enable{display:flex;align-items:center;gap:8px;background:var(--green);color:var(--green-ink);font-weight:800;font-size:13px;padding:12px 14px;border-radius:14px;margin-bottom:14px;cursor:pointer}
+.notif-enable.hide{display:none}
+.notif-enable .ic{font-size:20px;font-variation-settings:'FILL' 1}
 .celebrate{position:fixed;inset:0;z-index:120;pointer-events:none;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .celebrate .cmsg{background:var(--green);color:var(--green-ink);font-weight:800;font-size:16px;padding:14px 22px;border-radius:16px;box-shadow:0 16px 34px -12px rgba(10,30,20,.5);animation:cpop .5s cubic-bezier(.2,1.3,.4,1)}
 @keyframes cpop{0%{opacity:0;transform:scale(.6)}60%{opacity:1;transform:scale(1.05)}100%{transform:scale(1)}}
@@ -429,6 +432,7 @@ input[type=time]:focus{outline:none;border-color:var(--green)}
 
       <div class="pane on" id="p-accueil">
         <div class="greet"><h2 id="gHello">Bonjour</h2><p id="gDate"></p><span class="streak-chip" id="streakChip" style="display:none"></span></div>
+        <div class="notif-enable hide" id="notifEnable" onclick="enableNotifications()"><span class="ic">notifications_active</span> Activer les notifications</div>
 
         <div class="hero2">
           <div class="hero2-top">
@@ -593,10 +597,12 @@ const SUPA_URL='https://sapojxjmrzjrfjiejgwv.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhcG9qeGptcnpqcmZqaWVqZ3d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4ODY5MzgsImV4cCI6MjA5ODQ2MjkzOH0.kHd3h70SrDgd1S1H4GRd2hm8lbtCpJpoH8zJOkVF340';
 // =============================================
 const LS={week:'bigee_week',notif:'bigee_notifs'};
+const PLAN_START=new Date(2026,5,29); // lundi 29 juin 2026 = début de la semaine 1 (aujourd'hui = semaine 2)
+function curWeekFromDate(){var ms=Date.now()-PLAN_START.getTime();var w=Math.floor(ms/(7*24*3600*1000))+1;return Math.min(24,Math.max(1,w));}
 var NOTIFS=[],_myInserts={};
 function loadNotifs(){try{NOTIFS=JSON.parse(localStorage.getItem(LS.notif)||'[]')||[];}catch(e){NOTIFS=[];}}
 function saveNotifs(){try{localStorage.setItem(LS.notif,JSON.stringify(NOTIFS.slice(-60)));}catch(e){}}
-let supa=null, DEMO=false, USER=null, ACTIONS=[], CURW=Number(localStorage.getItem(LS.week)||1), SEGR='Diana', FOCR='Diana', CUR=null, CURPANE='accueil', MODE='signin', INAPP=false, APM=0, WSTAT='all', APS='all', MSGS=[];
+let supa=null, DEMO=false, USER=null, ACTIONS=[], CURW=curWeekFromDate(), SEGR='Diana', FOCR='Diana', CUR=null, CURPANE='accueil', MODE='signin', INAPP=false, APM=0, WSTAT='all', APS='all', MSGS=[];
 const MONTH=w=>Math.ceil(w/4);
 const RESP=['Diana','Daniel','Couple'];
 const RCLS={Diana:'oDiana',Daniel:'oDaniel',Couple:'oCouple'};
@@ -615,9 +621,10 @@ async function enableNotifications(){
     const reg=await navigator.serviceWorker.ready;
     let sub=await reg.pushManager.getSubscription();
     if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID_PUBLIC)});
-    await savePush(sub);toast('Rappels activés ✓');
+    await savePush(sub);toast('Notifications activées ✓');updateNotifBanner();
   }catch(e){toast('Échec activation notifications');}
 }
+function updateNotifBanner(){var el=document.getElementById('notifEnable');if(!el)return;var supported=('serviceWorker'in navigator)&&('PushManager'in window)&&('Notification'in window);var ok=supported&&Notification.permission==='granted';el.classList.toggle('hide',DEMO||!supported||ok);}
 async function refreshPush(){
   if(DEMO||!('serviceWorker'in navigator)||!('PushManager'in window)||!('Notification'in window))return;
   if(Notification.permission!=='granted')return;
@@ -824,7 +831,7 @@ function setStatut(s){if(!canEdit(CUR.responsable)){toast('Lecture seule');retur
 function setHeure(){const t=document.getElementById('dTime').value||null;persist(CUR.id,{heure_prevue:t,rappel_at:null});renderRem();toast(t?'Rappels : 15 min, 5 min avant, et à l’heure':'Heure retirée');}
 
 function initApp(){
-  INAPP=true;
+  INAPP=true;CURW=curWeekFromDate();
   var _es=document.getElementById('eSem');if(_es){var _o='';for(var i=1;i<=24;i++){_o+='<option value="'+i+'">Semaine '+i+' (Mois '+Math.ceil(i/4)+')</option>';}_es.innerHTML=_o;}
   document.querySelectorAll('.nav button[data-p]').forEach(b=>b.onclick=()=>navTo(b.dataset.p));
   document.querySelectorAll('#segWeek button').forEach(b=>b.onclick=()=>{SEGR=b.dataset.r;document.querySelectorAll('#segWeek button').forEach(x=>x.classList.toggle('act',x===b));renderWeek();});
@@ -834,7 +841,7 @@ function initApp(){
   document.querySelectorAll('#filtStatAp button').forEach(b=>b.onclick=()=>{APS=b.dataset.s;document.querySelectorAll('#filtStatAp button').forEach(x=>x.classList.toggle('act',x===b));renderApercu();});
   const prenom=(USER.user_metadata&&USER.user_metadata.prenom)||'Diana';
   document.getElementById('gHello').textContent=helloWord()+' '+prenom;
-  loadNotifs();pickQuote();
+  loadNotifs();pickQuote();updateNotifBanner();
   renderAll();history.replaceState({pane:'accueil'},'');show('accueil');refreshPush();loadMsgs();subscribeMsgs();bindChatLongPress();initPresence();renderBadges();
   loadRevues().then(renderRevHist);
 }
@@ -1040,7 +1047,7 @@ function demoData(){
   return A;
 }
 
-document.addEventListener('visibilitychange',function(){if(!document.hidden&&INAPP&&!DEMO&&supa){loadActions().then(renderAll).catch(function(){});}});
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&INAPP&&!DEMO&&supa){CURW=curWeekFromDate();loadActions().then(renderAll).catch(function(){});}});
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').then(function(reg){try{reg.update();}catch(e){}}).catch(function(){});var _swReloaded=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(_swReloaded)return;_swReloaded=true;location.reload();});}
 boot();
 </script>
